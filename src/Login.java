@@ -15,6 +15,11 @@ public class Login extends JFrame {
     public Login () {
         setLayout(new GridBagLayout());
         setTitle("Welcome - Login");
+        setSize(500, 500);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
         loginLabel = new JLabel("Welcome Enter your credentials or click register to signup");
         loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
         loginLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -85,16 +90,10 @@ public class Login extends JFrame {
         registerBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loginLabel.setText("You are going to signup");
+                new Register();
+                dispose();
             }
         });
     }
 
-
-    public static void main(String[] args) {
-        Login login = new Login();
-        login.setSize(500, 500);
-        login.setVisible(true);
-        login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
 }

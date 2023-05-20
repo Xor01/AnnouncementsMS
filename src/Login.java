@@ -67,8 +67,6 @@ public class Login extends JFrame {
         gbc.gridy = 3;
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-
-        gbc.anchor = GridBagConstraints.WEST;
         add(registerBtn, gbc);
 
 //        login button

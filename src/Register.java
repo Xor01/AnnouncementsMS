@@ -15,6 +15,10 @@ public class Register extends JFrame {
     public Register() {
         setLayout(new GridBagLayout());
         setTitle("Welcome - Register");
+        setSize(500, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
 
 
         loginLabel = new JLabel("Welcome Create your --OurApplicationName-- Account");
@@ -125,10 +129,7 @@ public class Register extends JFrame {
             }
         });
 
-        setSize(500, 500);
-        setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+
     }
 
 }

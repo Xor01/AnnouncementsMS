@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
+import java.util.Arrays;
 
 public class Login extends JFrame {
 
@@ -79,11 +81,26 @@ public class Login extends JFrame {
         gbc.gridx = 3;
         gbc.gridwidth = 2;
         add(loginBtn, gbc);
-
+        getRootPane().setDefaultButton(loginBtn);
         loginBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loginLabel.setText("You are logged in");
+                try {
+                    Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
+                    String query = String.format("Select username, pass from Users where username = '%s'" +
+                            " and pass = '%s' ", usernameField.getText(), new String(passwordField.getPassword()));
+                    ResultSet statement = con.prepareStatement(query).executeQuery();
+
+                   if (statement.next()){
+                       loginLabel.setText("You are logged in");
+                   }
+                   else {
+                       loginLabel.setText("Wrong username/password");
+                   }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    System.out.println("Error: Check your credentials or call support");
+                }
             }
         });
 

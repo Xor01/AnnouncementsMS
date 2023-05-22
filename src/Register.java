@@ -149,7 +149,7 @@ public class Register extends JFrame {
                 if (firstname.isEmpty() || lastname.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
                     JOptionPane.showMessageDialog(getContentPane(),
                             "All fields are mandatory!!",
-                            "Empty Field",
+                            "Empty Fields",
                             JOptionPane.ERROR_MESSAGE);
                 } else {
 

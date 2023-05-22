@@ -94,6 +94,8 @@ public class Login extends JFrame {
 
                    if (statement.next()){
                        loginLabel.setText("You are logged in");
+                       dispose();
+                       new User();
                    }
                    else {
                        loginLabel.setText("Wrong username/password");

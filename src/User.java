@@ -16,7 +16,7 @@ public class User extends JFrame {
         Rectangle device = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         setSize(device.getSize());
         /*  This is the beginning of the jTabbedPane  */
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT, JTabbedPane.WRAP_TAB_LAYOUT);
+        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT);
 
         JPanel test = new JPanel();
         test.add(new JButton("Test Button"));

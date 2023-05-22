@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.util.Arrays;
 
 public class Login extends JFrame {
 
@@ -22,7 +21,7 @@ public class Login extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        loginLabel = new JLabel("Welcome Enter your credentials or click register to signup");
+        loginLabel = new JLabel("Welcome Enter your credentials or click register to create your account");
         loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
         loginLabel.setVerticalAlignment(SwingConstants.CENTER);
         loginBtn = new JButton("Login");
@@ -86,9 +85,11 @@ public class Login extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    String username = usernameField.getText().trim();
+                    String password = new String(passwordField.getPassword()).trim();
                     Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
                     String query = String.format("Select username, pass from Users where username = '%s'" +
-                            " and pass = '%s' ", usernameField.getText(), new String(passwordField.getPassword()));
+                            " and pass = '%s' ", username, password);
                     ResultSet statement = con.prepareStatement(query).executeQuery();
 
                    if (statement.next()){

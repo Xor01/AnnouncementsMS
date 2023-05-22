@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class Register extends JFrame {
 
@@ -26,7 +27,7 @@ public class Register extends JFrame {
         loginLabel.setVerticalAlignment(SwingConstants.CENTER);
 
         firstnameLabel = new JLabel("First Name: ");
-        lastNameLabel = new JLabel("First Name: ");
+        lastNameLabel = new JLabel("Last Name: ");
         usernameLabel = new JLabel("Username: ");
         passwordLabel = new JLabel("Password: ");
         emailLabel = new JLabel("Email Address: ");
@@ -102,14 +103,28 @@ public class Register extends JFrame {
         gbc.gridwidth = 2;
         add(emailField, gbc);
 
-//        register button
+
+        //        password label
         gbc.gridy = 5;
         gbc.gridx = 1;
         gbc.gridwidth = 2;
+        add(passwordLabel, gbc);
+
+//        password field
+        gbc.gridy = 5;
+        gbc.gridx = 3;
+        gbc.gridwidth = 2;
+        add(passwordField, gbc);
+
+//        register button
+        gbc.gridy = 6;
+        gbc.gridx = 1;
+        gbc.gridwidth = 2;
         add(registerBtn, gbc);
+        getRootPane().setDefaultButton(registerBtn);
 
 //        login button
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridx = 3;
         gbc.gridwidth = 2;
         add(loginBtn, gbc);
@@ -125,7 +140,43 @@ public class Register extends JFrame {
         registerBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loginLabel.setText("You are going to signup");
+                String firstname = firstnameField.getText().trim();
+                String lastname = lastNameField.getText().trim();
+                String username = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword()).trim();
+
+                if (firstname.isEmpty() || lastname.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(getContentPane(),
+                            "All fields are mandatory!!",
+                            "Empty Field",
+                            JOptionPane.ERROR_MESSAGE);
+                } else {
+
+                    try {
+                        Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
+                        String query = String.format(
+                                "Insert into Users (fname, lname, username, pass) values ('%s', '%s', '%s', '%s'); ",
+                                firstname,lastname, username, password
+                        );
+                        Statement s = con.createStatement();
+                        int resultState = s.executeUpdate(query);
+
+                        if (resultState == 1) {
+                            loginLabel.setText("Your Account has been created !!");
+                        } else {
+                            loginLabel.setText("An Error exist you");
+                        }
+                    }
+                    catch (SQLIntegrityConstraintViolationException ee){
+                        JOptionPane.showMessageDialog(getContentPane(),
+                                "This Username/email are registered",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         });
 

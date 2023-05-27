@@ -88,19 +88,29 @@ public class Login extends JFrame {
                     String username = usernameField.getText().trim();
                     String password = new String(passwordField.getPassword()).trim();
                     Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
-                    String query = String.format("Select username, pass from Users where username = '%s'" +
+                    String query = String.format("Select * from Users where username = '%s'" +
                             " and pass = '%s' ", username, password);
-                    ResultSet statement = con.prepareStatement(query).executeQuery();
-
-                   if (statement.next()){
+                    ResultSet re = con.prepareStatement(query).executeQuery();
+                   if (re.next()){
                        loginLabel.setText("You are logged in");
                        dispose();
-                       new User();
+                       int id = re.getInt("id");
+                       String firstname = re.getString("fname");
+                       String lastname = re.getString("lname");
+                       String email = re.getString("email");
+                       boolean isAdmin = re.getBoolean("isAdmin");
+                       new User(con, id, firstname, lastname, username, email, isAdmin);
                    }
                    else {
                        loginLabel.setText("Wrong username/password");
                    }
-                } catch (SQLException ex) {
+
+                }
+                catch(com.mysql.cj.jdbc.exceptions.CommunicationsException el ){
+                    JOptionPane.showMessageDialog(getContentPane(), "Your Connection with the our server could not be established", "Connection issues", JOptionPane.ERROR_MESSAGE);
+                }
+
+                catch (SQLException ex) {
                     ex.printStackTrace();
                     System.out.println("Error: Check your credentials or call support");
                 }

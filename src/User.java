@@ -18,6 +18,9 @@ public class User extends JFrame {
     private JTabbedPane groupsTabs;
     private TextArea typingArea;
     private JButton sendBtn;
+    /**
+     * to keep track of groups ids if each tab
+     */
     private ArrayList<Integer> group_ids;
 
     /**
@@ -52,6 +55,7 @@ public class User extends JFrame {
 
         JPanel typingPanel = new JPanel(new BorderLayout());
         sendBtn = new JButton("Send");
+        getRootPane().setDefaultButton(sendBtn);
         sendBtn.addActionListener(e -> sendMessage());
         if (!isAdmin){
             sendBtn.setEnabled(false);
@@ -156,6 +160,8 @@ public class User extends JFrame {
                 int r = con.prepareStatement(query).executeUpdate();
                 if (r == 1){
                     JOptionPane.showMessageDialog(this, "Successfully send the message");
+                    groupsTabs.removeAll();
+                    addGroups();
                 }
                 else {
                     JOptionPane.showMessageDialog(this, "failed to send the message");

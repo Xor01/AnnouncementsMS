@@ -4,7 +4,7 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
 
 public class User extends JFrame {
 
@@ -13,11 +13,12 @@ public class User extends JFrame {
     private String lastName;
     private String username;
     private String email;
-    private String password;
-
     private boolean isAdmin;
     private Connection con;
     private JTabbedPane groupsTabs;
+    private TextArea typingArea;
+    private JButton sendBtn;
+    private ArrayList<Integer> group_ids;
 
     /**
      * parametrized constructor you should pass a connection and the user information
@@ -41,6 +42,7 @@ public class User extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+        group_ids = new ArrayList<>();
         /*  This is the beginning of the jTabbedPane  */
         groupsTabs = new JTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -49,14 +51,15 @@ public class User extends JFrame {
         /*  This is the end of the jTabbedPane  */
 
         JPanel typingPanel = new JPanel(new BorderLayout());
-        JButton sendBtn = new JButton("Send");
+        sendBtn = new JButton("Send");
+        sendBtn.addActionListener(e -> sendMessage());
         if (!isAdmin){
             sendBtn.setEnabled(false);
             sendBtn.setToolTipText("Only admin can send");
         }
-        TextArea type = new TextArea();
+        typingArea = new TextArea();
 
-        typingPanel.add(type, BorderLayout.CENTER);
+        typingPanel.add(typingArea, BorderLayout.CENTER);
         typingPanel.add(sendBtn, BorderLayout.EAST);
         add(typingPanel, BorderLayout.SOUTH);
 
@@ -81,6 +84,7 @@ public class User extends JFrame {
                 panel.setEditable(false);
                 groupsTabs.addTab(re.getString("gName"), panel);
                 int group_id = re.getInt("group_id");
+                group_ids.add(group_id);
                 loadMessages(group_id, panel);
             }
 
@@ -95,30 +99,33 @@ public class User extends JFrame {
      * this method will load each message for each group
      */
     public void loadMessages(int group_id, JTextPane panel) {
-        // Create a StyledDocument to hold the text and styles
         StyledDocument document = panel.getStyledDocument();
 
         // Create a style for the sender name
         Style senderStyle = panel.addStyle("SenderStyle", null);
-        StyleConstants.setForeground(senderStyle, Color.RED);  // Set the text color
-        StyleConstants.setBold(senderStyle, true);  // Set the font weight
+        StyleConstants.setForeground(senderStyle, Color.RED);
+        StyleConstants.setBold(senderStyle, true);
 
         // Create a style for the created at timestamp
         Style timestampStyle = panel.addStyle("TimestampStyle", null);
-        StyleConstants.setForeground(timestampStyle, Color.GRAY);  // Set the text color
-        StyleConstants.setItalic(timestampStyle, true);  // Set the font style
+        StyleConstants.setForeground(timestampStyle, Color.GRAY);
+        StyleConstants.setItalic(timestampStyle, true);
         try{
             ResultSet re = con.prepareStatement(String.format(
                     "SELECT  distinct * FROM  messages, users where messages.group_id = %d and users.id = messages.sender_id", group_id
                     )
-
             ).executeQuery();
 
             while (re.next()){
                 String message = String.format(
                         "Sender: %s%nMessage: %s%n created at: %s%n",
                 re.getString("username"), re.getString("content"), re.getString("created_at"));
-                insertChatMessage(document, re.getString("username"), re.getString("content"), re.getString("created_at"), senderStyle, timestampStyle);
+                insertAnnouncement(
+                        document,
+                        re.getString("username"),
+                        re.getString("content"),
+                        re.getString("created_at"),
+                        senderStyle, timestampStyle);
                 panel.add(new JTextField(message, panel.getWidth()));
             }
 
@@ -131,14 +138,33 @@ public class User extends JFrame {
         }
     }
 
-    private static void insertChatMessage(StyledDocument document, String sender, String content, String timestamp, Style senderStyle, Style timestampStyle) throws BadLocationException {
-
-
+    private static void insertAnnouncement(StyledDocument document, String sender,
+            String content, String timestamp, Style senderStyle, Style timestampStyle) throws BadLocationException {
         document.insertString(document.getLength(), sender + ": ", senderStyle);
         document.insertString(document.getLength(), content + "\n", null);
         document.insertString(document.getLength(), "  " + timestamp + "\n", timestampStyle);
     }
-    public static void main(String[] args) {
-//        User u =  new User(null);
+
+    private void sendMessage(){
+        String message = typingArea.getText();
+        if (isAdmin){
+            try {
+                String query = String.format(
+                        "INSERT INTO messages (sender_id, group_id, content, created_at) Values" +
+                        "(%d, %d, '%s', current_timestamp)",
+                id,group_ids.get(groupsTabs.getSelectedIndex()), message);
+                int r = con.prepareStatement(query).executeUpdate();
+                if (r == 1){
+                    JOptionPane.showMessageDialog(this, "Successfully send the message");
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "failed to send the message");
+                }
+
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
     }
 }

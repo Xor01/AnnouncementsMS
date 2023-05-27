@@ -1,28 +1,50 @@
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class User extends JFrame {
+
+    private int id;
     private String firstname;
     private String lastName;
     private String username;
     private String email;
     private String password;
 
-    public User() {
-        super("Welcome - User");
-        Rectangle device = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-        setSize(device.getSize());
+    private boolean isAdmin;
+    private Connection con;
+    private JTabbedPane groupsTabs;
+
+    /**
+     * parametrized constructor you should pass a connection and the user information
+     * @param con connection
+     * @param id user is
+     * @param firstname user firstname
+     * @param lastName user last name
+     * @param username user's username
+     * @param email email address
+     * @param isAdmin boolean value to represent if a use is admin or not
+     */
+    public User(Connection con, int id, String firstname, String lastName, String username, String email, boolean isAdmin) {
+        this.con = con;
+        this.id = id;
+        this.firstname = firstname;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.isAdmin = isAdmin;
+        setTitle("Welcome - " + username);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
         /*  This is the beginning of the jTabbedPane  */
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT);
+        groupsTabs = new JTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        JPanel test = new JPanel();
-        test.add(new JButton("Test Button"));
-
-        tabbedPane.addTab("Group 1", test);
-        tabbedPane.addTab("OOP 2", new JPanel());
-        tabbedPane.addTab("Some Random Group", new JPanel());
-        tabbedPane.addTab("G4", new JPanel());
-        add(tabbedPane);
+        addGroups();
+        add(groupsTabs);
         /*  This is the end of the jTabbedPane  */
 
         JPanel typingPanel = new JPanel(new BorderLayout());
@@ -34,9 +56,32 @@ public class User extends JFrame {
         add(typingPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * This method will load the group a specific user is registered in
+     */
+    private void addGroups(){
+        try{
+            ResultSet re = con.prepareStatement(
+                    "SELECT  * FROM  agroups, groupmembers where groupmembers.member_id = '1'", this.id
+            ).executeQuery();
+
+            while (re.next()){
+                groupsTabs.addTab(re.getString("gName"), new JPanel());
+            }
+
+        }
+        catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "An error happened");
+        }
+    }
+
+    /**
+     * this method will load each message for each group
+     */
+    public void loadMessages(ResultSet group) {
+
+    }
     public static void main(String[] args) {
-        User u =  new User();
-        u.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        u.setVisible(true);
+//        User u =  new User(null);
     }
 }

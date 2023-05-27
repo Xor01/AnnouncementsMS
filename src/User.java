@@ -8,20 +8,20 @@ import java.util.ArrayList;
 
 public class User extends JFrame {
 
-    private int id;
+    private final int id;
     private String firstname;
     private String lastName;
     private String username;
     private String email;
     private boolean isAdmin;
-    private Connection con;
-    private JTabbedPane groupsTabs;
-    private TextArea typingArea;
+    private final Connection con;
+    private final JTabbedPane groupsTabs;
+    private final TextArea typingArea;
     private JButton sendBtn;
     /**
      * to keep track of groups ids if each tab
      */
-    private ArrayList<Integer> group_ids;
+    private final ArrayList<Integer> group_ids;
 
     /**
      * parametrized constructor you should pass a connection and the user information
@@ -94,7 +94,7 @@ public class User extends JFrame {
 
         }
         catch (SQLException e){
-            System.out.println(e);
+            System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "An error happened");
         }
     }
@@ -136,7 +136,7 @@ public class User extends JFrame {
         }
         catch (SQLException e){
             JOptionPane.showMessageDialog(this, "An error happened");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }

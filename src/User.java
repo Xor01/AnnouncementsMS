@@ -66,7 +66,8 @@ public class User extends JFrame {
         typingPanel.add(typingArea, BorderLayout.CENTER);
         typingPanel.add(sendBtn, BorderLayout.EAST);
         add(typingPanel, BorderLayout.SOUTH);
-
+        updateMessages updateMessages = new updateMessages();
+        updateMessages.start();
     }
 
     /**
@@ -142,7 +143,7 @@ public class User extends JFrame {
         }
     }
 
-    private static void insertAnnouncement(StyledDocument document, String sender,
+    private void insertAnnouncement(StyledDocument document, String sender,
             String content, String timestamp, Style senderStyle, Style timestampStyle) throws BadLocationException {
         document.insertString(document.getLength(), sender + ": ", senderStyle);
         document.insertString(document.getLength(), content + "\n", null);
@@ -171,6 +172,23 @@ public class User extends JFrame {
                 System.out.println(e.getMessage());
             }
 
+        }
+    }
+
+    private class updateMessages extends Thread{
+
+        @Override
+        public void run(){
+            this.setDaemon(true);
+            while (true){
+                groupsTabs.removeAll();
+                addGroups();
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 }

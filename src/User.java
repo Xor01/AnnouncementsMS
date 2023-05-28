@@ -117,7 +117,7 @@ public class User extends JFrame {
         StyleConstants.setItalic(timestampStyle, true);
         try{
             ResultSet re = con.prepareStatement(String.format(
-                    "SELECT  distinct * FROM  messages, users where messages.group_id = %d and users.id = messages.sender_id", group_id
+                    "SELECT  distinct * FROM  messages, users where messages.group_id = %d and users.id = messages.sender_id Order by created_at desc", group_id
                     )
             ).executeQuery();
 
@@ -179,7 +179,6 @@ public class User extends JFrame {
 
         @Override
         public void run(){
-            this.setDaemon(true);
             while (true){
                 groupsTabs.removeAll();
                 addGroups();

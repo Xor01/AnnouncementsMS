@@ -5,7 +5,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
+import java.util.TimerTask;
+import  java.util.Timer;
 public class User extends JFrame {
 
     private final int id;
@@ -152,7 +153,7 @@ public class User extends JFrame {
 
     private void sendMessage(){
         String message = typingArea.getText();
-        if (isAdmin){
+        if (isAdmin && !message.isEmpty()){
             try {
                 String query = String.format(
                         "INSERT INTO messages (sender_id, group_id, content, created_at) Values" +
@@ -179,15 +180,15 @@ public class User extends JFrame {
 
         @Override
         public void run(){
-            while (true){
-                groupsTabs.removeAll();
-                addGroups();
-                try {
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    groupsTabs.removeAll();
+                    addGroups();
                 }
-            }
+            };
+            Timer timer = new Timer();
+            timer.schedule(timerTask, 0, 10000);
         }
     }
 }

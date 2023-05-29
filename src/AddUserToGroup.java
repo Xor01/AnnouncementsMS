@@ -19,16 +19,16 @@ public class AddUserToGroup implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String usernameToAdd = JOptionPane.showInputDialog(frame.getContentPane(), "Enter a username to add");
-        if (usernameToAdd == null){
-            usernameToAdd = "";
-        }
         try {
-            if (!usernameToAdd.isEmpty()) {
+            if (usernameToAdd != null) {
                 usernameToAdd = usernameToAdd.trim();
                 ResultSet userIdResult = con.prepareStatement(
                         String.format("select id from users where username = '%s'",
                                 usernameToAdd)).executeQuery();
-
+                if (usernameToAdd.isEmpty()){
+                    JOptionPane.showMessageDialog(frame.getContentPane(), "Empty username");
+                    return;
+                }
                 try {
                     while (userIdResult.next()) {
                         int userId = userIdResult.getInt("id");
@@ -50,8 +50,6 @@ public class AddUserToGroup implements ActionListener {
                     JOptionPane.showMessageDialog(frame.getContentPane(), "This user does not exit");
                 }
             }
-            else
-                JOptionPane.showMessageDialog(frame.getContentPane(), "Empty username");
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }

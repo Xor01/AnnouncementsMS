@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -87,10 +89,19 @@ public class User extends JFrame {
 
             while (re.next()){
                 JTextPane panel = new JTextPane();
+                JPanel groupDetails = new JPanel(new BorderLayout());
+                groupDetails.add(panel, BorderLayout.CENTER);
+                JButton addUser = new JButton("Add users to " + re.getString("gName"));
+                if (!isAdmin){
+                    addUser.setEnabled(false);
+                    addUser.setToolTipText("Only admins can add users");
+                }
+                groupDetails.add(addUser, BorderLayout.NORTH);
                 panel.setEditable(false);
-                groupsTabs.addTab(re.getString("gName"), panel);
+                groupsTabs.addTab(re.getString("gName"), groupDetails);
                 int group_id = re.getInt("group_id");
                 group_ids.add(group_id);
+                addUser.addActionListener(new AddUserToGroup(this, this.con, group_id));
                 loadMessages(group_id, panel);
             }
 
@@ -144,6 +155,16 @@ public class User extends JFrame {
         }
     }
 
+    /**
+     * insert a styled text to the JTextPane contains (content, sender name, and timestamp)
+     * @param document styles document object
+     * @param sender username of the sender
+     * @param content the message to be showed
+     * @param timestamp the time of the message
+     * @param senderStyle the sender text style
+     * @param timestampStyle the timestamp style
+     * @throws BadLocationException thrown when a location that does not exist
+     */
     private void insertAnnouncement(StyledDocument document, String sender,
             String content, String timestamp, Style senderStyle, Style timestampStyle) throws BadLocationException {
         document.insertString(document.getLength(), sender + ": ", senderStyle);
@@ -187,8 +208,8 @@ public class User extends JFrame {
                     addGroups();
                 }
             };
-            Timer timer = new Timer();
-            timer.schedule(timerTask, 0, 10000);
+//            Timer timer = new Timer();
+//            timer.scheduleAtFixedRate(timerTask, 10000, 10000);
         }
     }
 }

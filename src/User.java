@@ -92,11 +92,15 @@ public class User extends JFrame {
                 JPanel groupDetails = new JPanel(new BorderLayout());
                 groupDetails.add(panel, BorderLayout.CENTER);
                 JButton addUser = new JButton("Add users to " + re.getString("gName"));
+                JButton showUsers = new JButton("List members of " +re.getString("gName"));
                 if (!isAdmin){
                     addUser.setEnabled(false);
                     addUser.setToolTipText("Only admins can add users");
+                    showUsers.setEnabled(false);
+                    showUsers.setToolTipText("Only admins can list users");
                 }
                 groupDetails.add(addUser, BorderLayout.NORTH);
+                groupDetails.add(showUsers, BorderLayout.SOUTH);
                 panel.setEditable(false);
                 groupsTabs.addTab(re.getString("gName"), groupDetails);
                 int group_id = re.getInt("group_id");

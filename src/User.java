@@ -92,19 +92,24 @@ public class User extends JFrame {
                 JPanel groupDetails = new JPanel(new BorderLayout());
                 groupDetails.add(new JScrollPane(announcementsPanel), BorderLayout.CENTER);
                 JButton addUser = new JButton("Add users to " + re.getString("gName"));
-                JButton showUsers = new JButton("List members of " +re.getString("gName"));
                 if (!isAdmin){
                     addUser.setEnabled(false);
                     addUser.setToolTipText("Only admins can add users");
-                    showUsers.setEnabled(false);
-                    showUsers.setToolTipText("Only admins can list users");
                 }
                 groupDetails.add(addUser, BorderLayout.NORTH);
-                groupDetails.add(showUsers, BorderLayout.SOUTH);
                 announcementsPanel.setEditable(false);
                 groupsTabs.addTab(re.getString("gName"), groupDetails);
                 int group_id = re.getInt("group_id");
                 group_ids.add(group_id);
+
+                // this will create the group member list
+                ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
+
+                listUsersOfAGroup.doWork();
+                JPanel listOfUsersPanel = listUsersOfAGroup.returnPanel();
+                if (isAdmin){
+                    groupDetails.add(listOfUsersPanel, BorderLayout.EAST, group_id);
+                }
                 addUser.addActionListener(new AddUserToGroup(this, this.con, group_id));
                 loadMessages(group_id, announcementsPanel);
             }
@@ -212,8 +217,8 @@ public class User extends JFrame {
                     addGroups();
                 }
             };
-//            Timer timer = new Timer();
-//            timer.scheduleAtFixedRate(timerTask, 10000, 10000);
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(timerTask, 10000, 10000);
         }
     }
 }

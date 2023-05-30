@@ -88,9 +88,9 @@ public class User extends JFrame {
             ).executeQuery();
 
             while (re.next()){
-                JTextPane panel = new JTextPane();
+                JTextPane announcementsPanel = new JTextPane();
                 JPanel groupDetails = new JPanel(new BorderLayout());
-                groupDetails.add(new JScrollPane(panel), BorderLayout.CENTER);
+                groupDetails.add(new JScrollPane(announcementsPanel), BorderLayout.CENTER);
                 JButton addUser = new JButton("Add users to " + re.getString("gName"));
                 JButton showUsers = new JButton("List members of " +re.getString("gName"));
                 if (!isAdmin){
@@ -101,12 +101,12 @@ public class User extends JFrame {
                 }
                 groupDetails.add(addUser, BorderLayout.NORTH);
                 groupDetails.add(showUsers, BorderLayout.SOUTH);
-                panel.setEditable(false);
+                announcementsPanel.setEditable(false);
                 groupsTabs.addTab(re.getString("gName"), groupDetails);
                 int group_id = re.getInt("group_id");
                 group_ids.add(group_id);
                 addUser.addActionListener(new AddUserToGroup(this, this.con, group_id));
-                loadMessages(group_id, panel);
+                loadMessages(group_id, announcementsPanel);
             }
 
         }

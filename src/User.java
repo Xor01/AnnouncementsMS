@@ -78,28 +78,29 @@ public class User extends JFrame {
      */
     private void addGroups(){
         try{
-            ResultSet re = con.prepareStatement(
+            ResultSet result = con.prepareStatement(
                     String.format(
-                            "SELECT  * " +
-                                    "FROM  agroups, groupmembers" +
-                                    " where groupmembers.member_id = %d " +
-                                    "and agroups.id = groupmembers.group_id", this.id
+                            "SELECT agroups.*, groupmembers.group_id " +
+                                    "FROM agroups " +
+                                    "JOIN groupmembers ON agroups.id = groupmembers.group_id " +
+                                    "WHERE groupmembers.member_id = %d",
+                            this.id
                     )
             ).executeQuery();
 
-            while (re.next()){
+            while (result.next()){
                 JTextPane announcementsPanel = new JTextPane();
                 JPanel groupDetails = new JPanel(new BorderLayout());
                 groupDetails.add(new JScrollPane(announcementsPanel), BorderLayout.CENTER);
-                JButton addUser = new JButton("Add users to " + re.getString("gName"));
+                JButton addUser = new JButton("Add users to " + result.getString("gName"));
                 if (!isAdmin){
                     addUser.setEnabled(false);
                     addUser.setToolTipText("Only admins can add users");
                 }
                 groupDetails.add(addUser, BorderLayout.NORTH);
                 announcementsPanel.setEditable(false);
-                groupsTabs.addTab(re.getString("gName"), groupDetails);
-                int group_id = re.getInt("group_id");
+                groupsTabs.addTab(result.getString("gName"), groupDetails);
+                int group_id = result.getInt("group_id");
                 group_ids.add(group_id);
 
                 // this will create the group member list

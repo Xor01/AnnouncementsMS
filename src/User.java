@@ -66,7 +66,7 @@ public class User extends JFrame {
         }
         typingArea = new TextArea();
 
-        typingPanel.add(typingArea, BorderLayout.CENTER);
+        typingPanel.add(new JScrollPane(typingArea), BorderLayout.CENTER);
         typingPanel.add(sendBtn, BorderLayout.EAST);
         add(typingPanel, BorderLayout.SOUTH);
         updateMessages updateMessages = new updateMessages();
@@ -90,7 +90,7 @@ public class User extends JFrame {
             while (re.next()){
                 JTextPane panel = new JTextPane();
                 JPanel groupDetails = new JPanel(new BorderLayout());
-                groupDetails.add(panel, BorderLayout.CENTER);
+                groupDetails.add(new JScrollPane(panel), BorderLayout.CENTER);
                 JButton addUser = new JButton("Add users to " + re.getString("gName"));
                 JButton showUsers = new JButton("List members of " +re.getString("gName"));
                 if (!isAdmin){

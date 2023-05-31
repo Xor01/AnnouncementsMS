@@ -5,12 +5,7 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        FlatLightLaf.setup();
-        try {
-            UIManager.setLookAndFeel(new FlatMacLightLaf());
-        } catch (UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
+        FlatMacLightLaf.setup();
         Login l = new Login();
         l.setSize(500, 500);
         l.setVisible(true);

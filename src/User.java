@@ -14,24 +14,23 @@ public class User extends JFrame {
     private String lastName;
     private String username;
     private String email;
-    private boolean isAdmin;
+    private final boolean isAdmin;
     private final Connection con;
     private final JTabbedPane groupsTabs;
     private final TextArea typingArea;
-    private JButton sendBtn;
     /**
      * to keep track of groups ids if each tab
      */
     private final ArrayList<Integer> group_ids;
 
     /**
-     * parametrized constructor you should pass a connection and the user information
-     * @param con connection
+     * parametrized constructor you should pass a database connection and the user information
+     * @param con database connection
      * @param id user is
-     * @param firstname user firstname
-     * @param lastName user last name
+     * @param firstname user first name
+     * @param lastName user's last name
      * @param username user's username
-     * @param email email address
+     * @param email user's email address
      * @param isAdmin boolean value to represent if a use is admin or not
      */
     public User(Connection con, int id, String firstname, String lastName, String username, String email, boolean isAdmin) {
@@ -55,7 +54,7 @@ public class User extends JFrame {
         /*  This is the end of the jTabbedPane  */
 
         JPanel typingPanel = new JPanel(new BorderLayout());
-        sendBtn = new JButton("Send");
+        JButton sendBtn = new JButton("Send");
         getRootPane().setDefaultButton(sendBtn);
         sendBtn.addActionListener(e -> sendMessage());
         if (!isAdmin){
@@ -90,12 +89,22 @@ public class User extends JFrame {
                 JTextPane announcementsPanel = new JTextPane();
                 JPanel groupDetails = new JPanel(new BorderLayout());
                 groupDetails.add(new JScrollPane(announcementsPanel), BorderLayout.CENTER);
-                JButton addUser = new JButton("Add users to " + result.getString("gName"));
+                JButton addUser = new JButton(new ImageIcon("assets/icons/addUser.png"));
+                addUser.setToolTipText("Add users to " + result.getString("gName"));
+                JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JButton updateBtn = new JButton(new ImageIcon("assets/icons/refresh.png"));
+                updateBtn.setToolTipText("Refresh");
+                topPanel.add(updateBtn);
+                updateBtn.addActionListener(e -> {
+                    groupsTabs.removeAll();
+                    addGroups();
+                });
+                topPanel.add(addUser);
                 if (!isAdmin){
                     addUser.setEnabled(false);
                     addUser.setToolTipText("Only admins can add users");
                 }
-                groupDetails.add(addUser, BorderLayout.NORTH);
+                groupDetails.add(topPanel, BorderLayout.NORTH);
                 announcementsPanel.setEditable(false);
                 groupsTabs.addTab(result.getString("gName"), groupDetails);
                 int group_id = result.getInt("group_id");
@@ -172,20 +181,20 @@ public class User extends JFrame {
         StyleConstants.setForeground(timestampStyle, Color.GRAY);
         StyleConstants.setItalic(timestampStyle, true);
         try{
-            ResultSet re = con.prepareStatement(String.format(
+            ResultSet result = con.prepareStatement(String.format(
                     "SELECT  distinct * FROM  messages, users where messages.group_id = %d and users.id = messages.sender_id Order by created_at desc", group_id
                     )
             ).executeQuery();
 
-            while (re.next()){
+            while (result.next()){
                 String message = String.format(
                         "Sender: %s%nMessage: %s%n created at: %s%n",
-                re.getString("username"), re.getString("content"), re.getString("created_at"));
+                result.getString("username"), result.getString("content"), result.getString("created_at"));
                 insertAnnouncement(
                         document,
-                        re.getString("username"),
-                        re.getString("content"),
-                        re.getString("created_at"),
+                        result.getString("username"),
+                        result.getString("content"),
+                        result.getString("created_at"),
                         senderStyle, timestampStyle);
                 panel.add(new JTextField(message, panel.getWidth()));
             }
@@ -227,8 +236,8 @@ public class User extends JFrame {
                 int r = con.prepareStatement(query).executeUpdate();
                 if (r == 1){
                     JOptionPane.showMessageDialog(this, "Successfully send the message");
-                    groupsTabs.removeAll();
-                    addGroups();
+                    callUpdateForeachGroup();
+                    typingArea.setText("");
                 }
                 else {
                     JOptionPane.showMessageDialog(this, "failed to send the message");
@@ -248,13 +257,11 @@ public class User extends JFrame {
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-//                    groupsTabs.removeAll();
-//                    addGroups();
                     callUpdateForeachGroup();
                 }
             };
             Timer timer = new Timer();
-            timer.scheduleAtFixedRate(timerTask, 0, 3000);
+            timer.scheduleAtFixedRate(timerTask, 0, 10000);
         }
     }
 }

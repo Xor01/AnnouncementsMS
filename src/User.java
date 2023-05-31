@@ -1,8 +1,6 @@
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -102,6 +100,7 @@ public class User extends JFrame {
                 groupsTabs.addTab(result.getString("gName"), groupDetails);
                 int group_id = result.getInt("group_id");
                 group_ids.add(group_id);
+                groupDetails.putClientProperty("group_id", group_id);
 
                 // this will create the group member list
                 ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
@@ -119,6 +118,31 @@ public class User extends JFrame {
         catch (SQLException e){
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "An error happened");
+        }
+    }
+
+    /**
+     * this method will call loadMessage to fetch new changes from the database
+     */
+    private void callUpdateForeachGroup(){
+        Component [] listOfComponents = groupsTabs.getComponents();
+        for (Component comp: listOfComponents){
+            if (comp instanceof JPanel){
+                int group_id = (int) ((JPanel) comp).getClientProperty("group_id");
+                for (Component panelComp:  ((JPanel) comp).getComponents()){
+                   if (panelComp instanceof JScrollPane){
+                       try {
+                           JScrollPane scrollPane = (JScrollPane) panelComp;
+                           JTextPane textPane = (JTextPane) scrollPane.getViewport().getView();
+                           textPane.setText("");
+                           loadMessages(group_id, textPane);
+                       }
+                       catch (Exception e){
+                           System.out.println("error");
+                       }
+                   }
+                }
+            }
         }
     }
 
@@ -214,12 +238,13 @@ public class User extends JFrame {
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    groupsTabs.removeAll();
-                    addGroups();
+//                    groupsTabs.removeAll();
+//                    addGroups();
+                    callUpdateForeachGroup();
                 }
             };
             Timer timer = new Timer();
-            timer.scheduleAtFixedRate(timerTask, 10000, 10000);
+            timer.scheduleAtFixedRate(timerTask, 0, 3000);
         }
     }
 }

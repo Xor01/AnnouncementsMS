@@ -1,16 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 
 public class Register extends JFrame {
 
-    private JLabel loginLabel, usernameLabel, passwordLabel, firstnameLabel, lastNameLabel, emailLabel;
+    private final JLabel loginLabel;
 
-    private JTextField usernameField, firstnameField, lastNameField, emailField;
-    private JPasswordField passwordField;
-    private JButton loginBtn, registerBtn;
+    private final JTextField usernameField;
+    private final JTextField firstnameField;
+    private final JTextField lastNameField;
+    private final JTextField emailField;
+    private final JPasswordField passwordField;
 
 
     public Register() {
@@ -26,11 +26,11 @@ public class Register extends JFrame {
         loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
         loginLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        firstnameLabel = new JLabel("First Name: ");
-        lastNameLabel = new JLabel("Last Name: ");
-        usernameLabel = new JLabel("Username: ");
-        passwordLabel = new JLabel("Password: ");
-        emailLabel = new JLabel("Email Address: ");
+        JLabel firstnameLabel = new JLabel("First Name: ");
+        JLabel lastNameLabel = new JLabel("Last Name: ");
+        JLabel usernameLabel = new JLabel("Username: ");
+        JLabel passwordLabel = new JLabel("Password: ");
+        JLabel emailLabel = new JLabel("Email Address: ");
 
         firstnameField = new JTextField(20);
         lastNameField = new JTextField(20);
@@ -38,8 +38,8 @@ public class Register extends JFrame {
         emailField = new JTextField(20);
         passwordField = new JPasswordField(20);
 
-        loginBtn = new JButton("Have an account ? Login instead");
-        registerBtn = new JButton("Register");
+        JButton loginBtn = new JButton("Have an account ? Login instead");
+        JButton registerBtn = new JButton("Register");
 
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -129,53 +129,47 @@ public class Register extends JFrame {
         gbc.gridwidth = 2;
         add(loginBtn, gbc);
 
-        loginBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Login();
-                dispose();
-            }
+        loginBtn.addActionListener(e -> {
+            new Login();
+            dispose();
         });
 
-        registerBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String firstname = firstnameField.getText().trim();
-                String lastname = lastNameField.getText().trim();
-                String username = usernameField.getText().trim();
-                String email = emailField.getText().trim();
-                String password = new String(passwordField.getPassword()).trim();
+        registerBtn.addActionListener(e -> {
+            String firstname = firstnameField.getText().trim();
+            String lastname = lastNameField.getText().trim();
+            String username = usernameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
 
-                if (firstname.isEmpty() || lastname.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (firstname.isEmpty() || lastname.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(getContentPane(),
+                        "All fields are mandatory!!",
+                        "Empty Fields",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+
+                try {
+                    Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
+                    String query = String.format(
+                            "Insert into Users (fname, lname, username, pass) values ('%s', '%s', '%s', '%s'); ",
+                            firstname,lastname, username, password
+                    );
+                    Statement s = con.createStatement();
+                    int resultState = s.executeUpdate(query);
+
+                    if (resultState == 1) {
+                        loginLabel.setText("Your Account has been created !!");
+                    } else {
+                        loginLabel.setText("An Error exist you");
+                    }
+                }
+                catch (SQLIntegrityConstraintViolationException ee){
                     JOptionPane.showMessageDialog(getContentPane(),
-                            "All fields are mandatory!!",
-                            "Empty Fields",
-                            JOptionPane.ERROR_MESSAGE);
-                } else {
-
-                    try {
-                        Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
-                        String query = String.format(
-                                "Insert into Users (fname, lname, username, pass) values ('%s', '%s', '%s', '%s'); ",
-                                firstname,lastname, username, password
-                        );
-                        Statement s = con.createStatement();
-                        int resultState = s.executeUpdate(query);
-
-                        if (resultState == 1) {
-                            loginLabel.setText("Your Account has been created !!");
-                        } else {
-                            loginLabel.setText("An Error exist you");
-                        }
-                    }
-                    catch (SQLIntegrityConstraintViolationException ee){
-                        JOptionPane.showMessageDialog(getContentPane(),
-                                "This Username/email are registered",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                    catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
+                            "This Username/email are registered",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
             }
         });

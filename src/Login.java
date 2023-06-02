@@ -1,17 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 
 public class Login extends JFrame {
 
-    private JLabel loginLabel, usernameLabel, passwordLabel;
+    private final JLabel loginLabel;
 
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private JButton loginBtn;
-    private JButton registerBtn;
+    private final JTextField usernameField;
+    private final JPasswordField passwordField;
 
     public Login () {
         setLayout(new GridBagLayout());
@@ -26,11 +22,11 @@ public class Login extends JFrame {
         loginLabel = new JLabel("Welcome Enter your credentials or click register to create your account");
         loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
         loginLabel.setVerticalAlignment(SwingConstants.CENTER);
-        loginBtn = new JButton("Login");
-        registerBtn = new JButton("Register");
+        JButton loginBtn = new JButton("Login");
+        JButton registerBtn = new JButton("Register");
 
-        usernameLabel = new JLabel("Username");
-        passwordLabel = new JLabel("Password");
+        JLabel usernameLabel = new JLabel("Username");
+        JLabel passwordLabel = new JLabel("Password");
 
         usernameField = new JTextField(20);
         passwordField = new JPasswordField(20);
@@ -83,48 +79,39 @@ public class Login extends JFrame {
         gbc.gridwidth = 2;
         add(loginBtn, gbc);
         getRootPane().setDefaultButton(loginBtn);
-        loginBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    String username = usernameField.getText().trim();
-                    String password = new String(passwordField.getPassword()).trim();
-                    Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
-                    String query = String.format("Select * from Users where username = '%s'" +
-                            " and pass = '%s' ", username, password);
-                    ResultSet re = con.prepareStatement(query).executeQuery();
-                   if (re.next()){
-                       loginLabel.setText("You are logged in");
-                       dispose();
-                       int id = re.getInt("id");
-                       String firstname = re.getString("fname");
-                       String lastname = re.getString("lname");
-                       String email = re.getString("email");
-                       boolean isAdmin = re.getBoolean("isAdmin");
-                       new User(con, id, firstname, lastname, username, email, isAdmin);
-                   }
-                   else {
-                       loginLabel.setText("Wrong username/password");
-                   }
+        loginBtn.addActionListener(e -> {
+            try {
+                String username = usernameField.getText().trim();
+                String password = new String(passwordField.getPassword()).trim();
+                Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
+                String query = String.format("Select * from Users where username = '%s'" +
+                        " and pass = '%s' ", username, password);
+                ResultSet re = con.prepareStatement(query).executeQuery();
+               if (re.next()){
+                   loginLabel.setText("You are logged in");
+                   dispose();
+                   int id = re.getInt("id");
+                   boolean isAdmin = re.getBoolean("isAdmin");
+                   new User(con, id, username, isAdmin);
+               }
+               else {
+                   loginLabel.setText("Wrong username/password");
+               }
 
-                }
-                catch(com.mysql.cj.jdbc.exceptions.CommunicationsException el ){
-                    JOptionPane.showMessageDialog(getContentPane(), "Your Connection with the our server could not be established", "Connection issues", JOptionPane.ERROR_MESSAGE);
-                }
+            }
+            catch(com.mysql.cj.jdbc.exceptions.CommunicationsException el ){
+                JOptionPane.showMessageDialog(getContentPane(), "Your Connection with the our server could not be established", "Connection issues", JOptionPane.ERROR_MESSAGE);
+            }
 
-                catch (SQLException ex) {
-                    ex.printStackTrace();
-                    System.out.println("Error: Check your credentials or call support");
-                }
+            catch (SQLException ex) {
+                ex.printStackTrace();
+                System.out.println("Error: Check your credentials or call support");
             }
         });
 
-        registerBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Register();
-                dispose();
-            }
+        registerBtn.addActionListener(e -> {
+            new Register();
+            dispose();
         });
     }
 

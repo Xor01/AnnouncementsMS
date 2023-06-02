@@ -12,10 +12,6 @@ import  java.util.Timer;
 public class User extends JFrame {
 
     private final int id;
-    private String firstname;
-    private String lastName;
-    private String username;
-    private String email;
     private final boolean isAdmin;
     private final Connection con;
     private final JTabbedPane groupsTabs;
@@ -29,19 +25,12 @@ public class User extends JFrame {
      * parametrized constructor you should pass a database connection and the user information
      * @param con database connection
      * @param id user is
-     * @param firstname user first name
-     * @param lastName user's last name
      * @param username user's username
-     * @param email user's email address
      * @param isAdmin boolean value to represent if a use is admin or not
      */
-    public User(Connection con, int id, String firstname, String lastName, String username, String email, boolean isAdmin) {
+    public User(Connection con, int id, String username, boolean isAdmin) {
         this.con = con;
         this.id = id;
-        this.firstname = firstname;
-        this.lastName = lastName;
-        this.username = username;
-        this.email = email;
         this.isAdmin = isAdmin;
         setTitle("Welcome - " + username);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -127,9 +116,7 @@ public class User extends JFrame {
                     listUsersOfAGroup.doWork();
                     JButton listMembers = new JButton(new FlatSVGIcon("group.svg"));
                     listMembers.setToolTipText("List the members of group");
-                    listMembers.addActionListener(e -> {
-                        listUsersOfAGroup.showPopup();
-                    });
+                    listMembers.addActionListener(e -> listUsersOfAGroup.showPopup());
                     rightTopPanel.add(listMembers);
                 }
                 addUser.addActionListener(new AddUserToGroup(this, this.con, group_id));
@@ -232,7 +219,7 @@ public class User extends JFrame {
                     "Select id from messages where group_id= %d order by id desc limit 1",
                     group_id);
             ResultSet result = con.prepareStatement(query).executeQuery();
-            while (result.next()){
+            if (result.next()){
                 return result.getInt("id");
             }
         }

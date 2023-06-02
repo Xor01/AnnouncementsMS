@@ -57,7 +57,4 @@ public class ListUsersOfAGroup {
         }
     }
 
-    JPanel returnPanel(){
-        return this.usersListPanel;
-    }
 }

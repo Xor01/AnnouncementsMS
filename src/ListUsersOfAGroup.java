@@ -7,6 +7,7 @@ public class ListUsersOfAGroup {
     private final JPanel usersListPanel;
     private final JFrame frame;
     private final int groupId;
+    private JList<String> usernamesList;
     public ListUsersOfAGroup(Connection con, int groupId, JFrame frame){
         this.con = con;
         this.groupId = groupId;
@@ -25,7 +26,7 @@ public class ListUsersOfAGroup {
             DefaultListModel<String> listModel = new DefaultListModel<>();
             listModel.addElement("----- Members List of the Group -----");
             listModel.addElement(String.format("%-15s %-15s %-15s %-15s%n", "First Name", "Last Name", "Username", "email"));
-            JList<String> usernamesList = new JList<>(listModel);
+            usernamesList = new JList<>(listModel);
             usernamesList.setFont(new Font(Font.MONOSPACED, Font.BOLD, 10));
             while (resultSet.next()){
                 listModel.addElement(String.format(
@@ -40,6 +41,18 @@ public class ListUsersOfAGroup {
         }
         catch (SQLException sqlException){
             JOptionPane.showMessageDialog(frame, "Some errors happened");
+        }
+    }
+
+    void showPopup(){
+        JFrame frame = new JFrame("Group Members List");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(500, 500);
+        frame.setLocationRelativeTo(this.frame);
+        frame.setVisible(true);
+        frame.add(usernamesList);
+        if (!frame.isVisible()){
+            frame.setVisible(true);
         }
     }
 

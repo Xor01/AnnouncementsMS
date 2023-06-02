@@ -157,7 +157,6 @@ public class User extends JFrame {
                            JTextPane textPane = (JTextPane) scrollPane.getViewport().getView();
                            textPane.setText("");
                            loadMessages(group_id, textPane);
-                           updateMembersList(group_id, (JPanel) comp);
                        }
                        catch (Exception e){
                            System.out.println("error");
@@ -168,14 +167,7 @@ public class User extends JFrame {
         }
     }
 
-    private void updateMembersList(int group_id, JPanel groupPanel){
-//        ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
-//        listUsersOfAGroup.doWork();
-//        JPanel listOfUsersPanel = listUsersOfAGroup.returnPanel();
-//        if (isAdmin){
-//            groupPanel.add(listOfUsersPanel, BorderLayout.EAST, group_id);
-//        }
-    }
+
 
     /**
      * this method will load each message for each group

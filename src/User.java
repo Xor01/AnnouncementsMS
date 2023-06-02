@@ -149,17 +149,18 @@ public class User extends JFrame {
         Component [] listOfComponents = groupsTabs.getComponents();
         for (Component comp: listOfComponents){
             if (comp instanceof JPanel){
-                int group_id = (int) ((JPanel) comp).getClientProperty("group_id");
                 for (Component panelComp:  ((JPanel) comp).getComponents()){
                    if (panelComp instanceof JScrollPane){
                        try {
                            JScrollPane scrollPane = (JScrollPane) panelComp;
                            JTextPane textPane = (JTextPane) scrollPane.getViewport().getView();
-                           textPane.setText("");
-                           loadMessages(group_id, textPane);
+                           if (((JPanel) comp).getClientProperty("group_id") != null){
+                               int group_id = (int) ((JPanel) comp).getClientProperty("group_id");
+                               loadMessages(group_id, textPane);
+                           }
                        }
                        catch (Exception e){
-                           System.out.println("error");
+                           e.printStackTrace();
                        }
                    }
                 }
@@ -186,10 +187,15 @@ public class User extends JFrame {
         StyleConstants.setItalic(timestampStyle, true);
         try{
             ResultSet result = con.prepareStatement(String.format(
-                    "SELECT  distinct * FROM  messages, users where messages.group_id = %d and users.id = messages.sender_id Order by created_at desc", group_id
+                    "SELECT  distinct * FROM  messages, users where messages.group_id = %d and users.id = messages.sender_id Order by created_at", group_id
                     )
             ).executeQuery();
-
+            if (panel.getClientProperty("last_id") != null){
+                if (getLastMessageId(group_id) <= (int) panel.getClientProperty("last_id")){
+                    return;
+                }
+            }
+            panel.setText("");
             while (result.next()){
                 String message = String.format(
                         "Sender: %s%nMessage: %s%n created at: %s%n",
@@ -201,6 +207,7 @@ public class User extends JFrame {
                         result.getString("created_at"),
                         senderStyle, timestampStyle);
                 panel.add(new JTextField(message, panel.getWidth()));
+                panel.putClientProperty("last_id", result.getInt("id"));
             }
 
         }
@@ -210,6 +217,29 @@ public class User extends JFrame {
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * returns the last message id of a group
+     * @param group_id the id of a group to get last message id from
+     * @return returns last message id or -1 if non is found
+     */
+    private int getLastMessageId (int group_id) {
+
+        try{
+            String query = String.format(
+                    "Select id from messages where group_id= %d order by id desc limit 1",
+                    group_id);
+            ResultSet result = con.prepareStatement(query).executeQuery();
+            while (result.next()){
+                return result.getInt("id");
+            }
+        }
+        catch (SQLException sqlException){
+            sqlException.printStackTrace();
+        }
+
+        return -1;
     }
 
     /**
@@ -265,7 +295,7 @@ public class User extends JFrame {
                 }
             };
             Timer timer = new Timer();
-            timer.scheduleAtFixedRate(timerTask, 0, 10000);
+            timer.scheduleAtFixedRate(timerTask, 0, 500);
         }
     }
 }

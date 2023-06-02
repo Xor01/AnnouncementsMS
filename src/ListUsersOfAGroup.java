@@ -51,6 +51,7 @@ public class ListUsersOfAGroup {
         frame.setLocationRelativeTo(this.frame);
         frame.setVisible(true);
         frame.add(usernamesList);
+        doWork();
         if (!frame.isVisible()){
             frame.setVisible(true);
         }

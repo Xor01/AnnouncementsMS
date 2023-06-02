@@ -125,11 +125,12 @@ public class User extends JFrame {
                 if (isAdmin){
                     ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
                     listUsersOfAGroup.doWork();
-                    JButton listUsers = new JButton(new FlatSVGIcon("group.svg"));
-                    listUsers.addActionListener(e -> {
+                    JButton listMembers = new JButton(new FlatSVGIcon("group.svg"));
+                    listMembers.setToolTipText("List the members of group");
+                    listMembers.addActionListener(e -> {
                         listUsersOfAGroup.showPopup();
                     });
-                    rightTopPanel.add(listUsers);
+                    rightTopPanel.add(listMembers);
                 }
                 addUser.addActionListener(new AddUserToGroup(this, this.con, group_id));
                 loadMessages(group_id, announcementsPanel);

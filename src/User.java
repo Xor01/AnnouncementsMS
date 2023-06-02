@@ -1,3 +1,5 @@
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -47,8 +49,7 @@ public class User extends JFrame {
         setVisible(true);
         group_ids = new ArrayList<>();
         /*  This is the beginning of the jTabbedPane  */
-        groupsTabs = new JTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT);
-
+        groupsTabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
         addGroups();
         add(groupsTabs);
         /*  This is the end of the jTabbedPane  */
@@ -87,24 +88,33 @@ public class User extends JFrame {
 
             while (result.next()){
                 JTextPane announcementsPanel = new JTextPane();
+                announcementsPanel.setFocusable(false);
                 JPanel groupDetails = new JPanel(new BorderLayout());
                 groupDetails.add(new JScrollPane(announcementsPanel), BorderLayout.CENTER);
-                JButton addUser = new JButton(new ImageIcon("assets/icons/addUser.png"));
+                JButton addUser = new JButton(new FlatSVGIcon("addUser.svg"));
                 addUser.setToolTipText("Add users to " + result.getString("gName"));
-                JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                JButton updateBtn = new JButton(new ImageIcon("assets/icons/refresh.png"));
+                /*  creating the three panels to have right and left panels both added to main panel*/
+                JPanel mainTopPanel = new JPanel(new BorderLayout());
+                JPanel leftTopPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JPanel rightTopPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+                // adding left and right panels to main panel
+                mainTopPanel.add(leftTopPanel, BorderLayout.WEST);
+                mainTopPanel.add(rightTopPanel, BorderLayout.EAST);
+
+                JButton updateBtn = new JButton(new FlatSVGIcon("refresh.svg"));
                 updateBtn.setToolTipText("Refresh");
-                topPanel.add(updateBtn);
+                leftTopPanel.add(updateBtn);
                 updateBtn.addActionListener(e -> {
                     groupsTabs.removeAll();
                     addGroups();
                 });
-                topPanel.add(addUser);
+                leftTopPanel.add(addUser);
                 if (!isAdmin){
                     addUser.setEnabled(false);
                     addUser.setToolTipText("Only admins can add users");
                 }
-                groupDetails.add(topPanel, BorderLayout.NORTH);
+                groupDetails.add(mainTopPanel, BorderLayout.NORTH);
                 announcementsPanel.setEditable(false);
                 groupsTabs.addTab(result.getString("gName"), groupDetails);
                 int group_id = result.getInt("group_id");
@@ -112,12 +122,14 @@ public class User extends JFrame {
                 groupDetails.putClientProperty("group_id", group_id);
 
                 // this will create the group member list
-                ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
-
-                listUsersOfAGroup.doWork();
-                JPanel listOfUsersPanel = listUsersOfAGroup.returnPanel();
                 if (isAdmin){
-                    groupDetails.add(listOfUsersPanel, BorderLayout.EAST, group_id);
+                    ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
+                    listUsersOfAGroup.doWork();
+                    JButton listUsers = new JButton(new FlatSVGIcon("group.svg"));
+                    listUsers.addActionListener(e -> {
+                        listUsersOfAGroup.showPopup();
+                    });
+                    rightTopPanel.add(listUsers);
                 }
                 addUser.addActionListener(new AddUserToGroup(this, this.con, group_id));
                 loadMessages(group_id, announcementsPanel);
@@ -157,12 +169,12 @@ public class User extends JFrame {
     }
 
     private void updateMembersList(int group_id, JPanel groupPanel){
-        ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
-        listUsersOfAGroup.doWork();
-        JPanel listOfUsersPanel = listUsersOfAGroup.returnPanel();
-        if (isAdmin){
-            groupPanel.add(listOfUsersPanel, BorderLayout.EAST, group_id);
-        }
+//        ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
+//        listUsersOfAGroup.doWork();
+//        JPanel listOfUsersPanel = listUsersOfAGroup.returnPanel();
+//        if (isAdmin){
+//            groupPanel.add(listOfUsersPanel, BorderLayout.EAST, group_id);
+//        }
     }
 
     /**

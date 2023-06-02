@@ -18,6 +18,8 @@ public class Login extends JFrame {
         setTitle("Welcome - Login");
         setSize(500, 500);
         setVisible(true);
+        Image icon = Toolkit.getDefaultToolkit().getImage("assets/icons/addUser.png");
+        setIconImage(icon);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

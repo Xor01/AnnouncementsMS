@@ -83,9 +83,10 @@ public class Login extends JFrame {
             try {
                 String username = usernameField.getText().trim();
                 String password = new String(passwordField.getPassword()).trim();
+                PasswordHandler ps = new PasswordHandler(password);
                 Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
                 String query = String.format("Select * from Users where username = '%s'" +
-                        " and pass = '%s' ", username, password);
+                        " and pass = '%s' ", username, ps.getHashedPassword());
                 ResultSet re = con.prepareStatement(query).executeQuery();
                if (re.next()){
                    loginLabel.setText("You are logged in");

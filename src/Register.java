@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Register extends JFrame {
 
@@ -140,27 +142,44 @@ public class Register extends JFrame {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
-
+            PasswordHandler ps = new PasswordHandler(password);
+            String regex = "^(.+)@(.+)$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(email);
             if (firstname.isEmpty() || lastname.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(getContentPane(),
                         "All fields are mandatory!!",
                         "Empty Fields",
                         JOptionPane.ERROR_MESSAGE);
-            } else {
+            }
+
+            else if (!matcher.matches()) {
+                JOptionPane.showMessageDialog(getContentPane(),
+                        "Please Enter a valid email address",
+                        "Unvaried Email address",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            else {
 
                 try {
                     Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
                     String query = String.format(
-                            "Insert into Users (fname, lname, username, pass) values ('%s', '%s', '%s', '%s'); ",
-                            firstname,lastname, username, password
+                            "Insert into Users (fname, lname, username, pass, email) values ('%s', '%s', '%s', '%s', '%s'); ",
+                            firstname,lastname, username, ps.getHashedPassword(), email
                     );
                     Statement s = con.createStatement();
                     int resultState = s.executeUpdate(query);
 
                     if (resultState == 1) {
                         loginLabel.setText("Your Account has been created !!");
+                        JOptionPane.showMessageDialog(getContentPane(),
+                                "Your Account has been registered successfully",
+                                "Successful Registration", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         loginLabel.setText("An Error exist you");
+                        JOptionPane.showMessageDialog(getContentPane(),
+                                "An error happened we could not register you",
+                                "Failure Registration", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 catch (SQLIntegrityConstraintViolationException ee){

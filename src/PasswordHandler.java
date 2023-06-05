@@ -3,7 +3,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 public final class PasswordHandler {
 
-    private String password;
+    private final String password;
     private String hashedPassword;
 
     public PasswordHandler(String password){
@@ -44,10 +44,5 @@ public final class PasswordHandler {
 
     public boolean comparePasswords(String password1, String password2){
         return password1.equals(password2);
-    }
-
-    public static void main(String[] args) throws NoSuchAlgorithmException{
-        PasswordHandler ps = new PasswordHandler("password");
-        System.out.println(ps.getHashedPassword());
     }
 }

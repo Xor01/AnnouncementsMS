@@ -1,6 +1,13 @@
-import javax.swing.*;
-import java.awt.*;
-import java.sql.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.ResultSet;
 public class ListUsersOfAGroup {
 
     private final Connection con;

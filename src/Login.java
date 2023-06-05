@@ -1,6 +1,22 @@
-import javax.swing.*;
-import java.awt.*;
-import java.sql.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
+
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+
+import java.sql.ResultSet;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Login extends JFrame {
 
@@ -16,7 +32,7 @@ public class Login extends JFrame {
         setVisible(true);
         Image icon = Toolkit.getDefaultToolkit().getImage("assets/icons/addUser.png");
         setIconImage(icon);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         loginLabel = new JLabel("Welcome Enter your credentials or click register to create your account");
@@ -92,8 +108,7 @@ public class Login extends JFrame {
                    loginLabel.setText("You are logged in");
                    dispose();
                    int id = re.getInt("id");
-                   boolean isAdmin = re.getBoolean("isAdmin");
-                   new User(con, id, username, isAdmin);
+                   SwingUtilities.invokeLater(() -> new User(con, id, username));
                }
                else {
                    loginLabel.setText("Wrong username/password");
@@ -111,7 +126,7 @@ public class Login extends JFrame {
         });
 
         registerBtn.addActionListener(e -> {
-            new Register();
+            SwingUtilities.invokeLater(Register::new);
             dispose();
         });
     }

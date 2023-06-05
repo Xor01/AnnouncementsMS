@@ -1,6 +1,22 @@
-import javax.swing.*;
-import java.awt.*;
-import java.sql.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +35,7 @@ public class Register extends JFrame {
         setLayout(new GridBagLayout());
         setTitle("Welcome - Register");
         setSize(500, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
 
@@ -132,7 +148,7 @@ public class Register extends JFrame {
         add(loginBtn, gbc);
 
         loginBtn.addActionListener(e -> {
-            new Login();
+            SwingUtilities.invokeLater(Login::new);
             dispose();
         });
 

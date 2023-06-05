@@ -1,8 +1,29 @@
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.JTabbedPane;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.JTextArea;
+
+import javax.swing.text.Style;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.BadLocationException;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Component;
+import java.awt.Color;
+import java.awt.Dimension;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,10 +33,9 @@ import  java.util.Timer;
 public class User extends JFrame {
 
     private final int id;
-    private final boolean isAdmin;
     private final Connection con;
     private final JTabbedPane groupsTabs;
-    private final TextArea typingArea;
+    private final JTextArea typingArea;
     /**
      * to keep track of groups ids if each tab
      */
@@ -26,12 +46,10 @@ public class User extends JFrame {
      * @param con database connection
      * @param id user is
      * @param username user's username
-     * @param isAdmin boolean value to represent if a use is admin or not
      */
-    public User(Connection con, int id, String username, boolean isAdmin) {
+    public User(Connection con, int id, String username) {
         this.con = con;
         this.id = id;
-        this.isAdmin = isAdmin;
         setTitle("Welcome - " + username);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,17 +65,21 @@ public class User extends JFrame {
         JButton sendBtn = new JButton("Send");
         getRootPane().setDefaultButton(sendBtn);
         sendBtn.addActionListener(e -> sendMessage());
-        if (!isAdmin){
-            sendBtn.setEnabled(false);
-            sendBtn.setToolTipText("Only admin can send");
-        }
-        typingArea = new TextArea();
-
+        typingArea = new JTextArea();
+        typingPanel.setPreferredSize(new Dimension(200, 150));
         typingPanel.add(new JScrollPane(typingArea), BorderLayout.CENTER);
         typingPanel.add(sendBtn, BorderLayout.EAST);
         add(typingPanel, BorderLayout.SOUTH);
         updateMessages updateMessages = new updateMessages();
         updateMessages.start();
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu view = new JMenu("View");
+        JMenuItem refresh = new JMenuItem("Refresh");
+        view.add(refresh);
+        menuBar.add(view);
+        setJMenuBar(menuBar);
+        refresh.addActionListener(e -> callUpdateForeachGroup());
     }
 
     /**
@@ -67,7 +89,7 @@ public class User extends JFrame {
         try{
             ResultSet result = con.prepareStatement(
                     String.format(
-                            "SELECT agroups.*, groupmembers.group_id " +
+                            "SELECT agroups.*, groupmembers.group_id, groupmembers.isAdmin " +
                                     "FROM agroups " +
                                     "JOIN groupmembers ON agroups.id = groupmembers.group_id " +
                                     "WHERE groupmembers.member_id = %d",
@@ -76,6 +98,7 @@ public class User extends JFrame {
             ).executeQuery();
 
             while (result.next()){
+                boolean isGroupAdmin = result.getBoolean("isAdmin");
                 JTextPane announcementsPanel = new JTextPane();
                 announcementsPanel.setFocusable(false);
                 JPanel groupDetails = new JPanel(new BorderLayout());
@@ -99,7 +122,7 @@ public class User extends JFrame {
                     addGroups();
                 });
                 leftTopPanel.add(addUser);
-                if (!isAdmin){
+                if (!isGroupAdmin){
                     addUser.setEnabled(false);
                     addUser.setToolTipText("Only admins can add users");
                 }
@@ -109,9 +132,9 @@ public class User extends JFrame {
                 int group_id = result.getInt("group_id");
                 group_ids.add(group_id);
                 groupDetails.putClientProperty("group_id", group_id);
-
+                groupDetails.putClientProperty("isGroupAdmin", isGroupAdmin);
                 // this will create the group member list
-                if (isAdmin){
+                if (isGroupAdmin){
                     ListUsersOfAGroup listUsersOfAGroup = new ListUsersOfAGroup(con, group_id, this);
                     listUsersOfAGroup.doWork();
                     JButton listMembers = new JButton(new FlatSVGIcon("group.svg"));
@@ -156,6 +179,25 @@ public class User extends JFrame {
         }
     }
 
+    /**
+     * check if this the user is a group admin
+     * @param selectedComp current tab component
+     * @return true of admin or false otherwise
+     */
+    private boolean isAdminInGroup(Component selectedComp){
+        if (selectedComp != null){
+            if (selectedComp instanceof JPanel){
+                try{
+                    JPanel tabPanel = (JPanel) selectedComp;
+                    return (boolean )tabPanel.getClientProperty("isGroupAdmin");
+                }
+                catch (Exception e){
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
 
 
     /**
@@ -249,7 +291,8 @@ public class User extends JFrame {
 
     private void sendMessage(){
         String message = typingArea.getText();
-        if (isAdmin && !message.isEmpty()){
+        boolean isThisGroupAdmin = isAdminInGroup(groupsTabs.getSelectedComponent());
+        if (isThisGroupAdmin && !message.isEmpty()){
             try {
                 String query = String.format(
                         "INSERT INTO messages (sender_id, group_id, content, created_at) Values" +
@@ -269,6 +312,12 @@ public class User extends JFrame {
                 System.out.println(e.getMessage());
             }
 
+        }
+        else if (!isThisGroupAdmin) {
+            JOptionPane.showMessageDialog(this, "Only Group Admin Can Send");
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "No Empty Announcements are Allowed to Send");
         }
     }
 

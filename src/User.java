@@ -1,17 +1,6 @@
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.JTabbedPane;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
@@ -23,7 +12,7 @@ import java.awt.FlowLayout;
 import java.awt.Component;
 import java.awt.Color;
 import java.awt.Dimension;
-
+import java.awt.TextArea;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,7 +24,7 @@ public class User extends JFrame {
     private final int id;
     private final Connection con;
     private final JTabbedPane groupsTabs;
-    private final JTextArea typingArea;
+    private final TextArea typingArea;
     /**
      * to keep track of groups ids if each tab
      */
@@ -65,9 +54,9 @@ public class User extends JFrame {
         JButton sendBtn = new JButton("Send");
         getRootPane().setDefaultButton(sendBtn);
         sendBtn.addActionListener(e -> sendMessage());
-        typingArea = new JTextArea();
+        typingArea = new TextArea();
         typingPanel.setPreferredSize(new Dimension(200, 150));
-        typingPanel.add(new JScrollPane(typingArea), BorderLayout.CENTER);
+        typingPanel.add(typingArea, BorderLayout.CENTER);
         typingPanel.add(sendBtn, BorderLayout.EAST);
         add(typingPanel, BorderLayout.SOUTH);
         updateMessages updateMessages = new updateMessages();
@@ -75,10 +64,22 @@ public class User extends JFrame {
 
         JMenuBar menuBar = new JMenuBar();
         JMenu view = new JMenu("View");
+        JMenu group = new JMenu("Groups");
+
+        JMenuItem createGroup = new JMenuItem("add Group");
         JMenuItem refresh = new JMenuItem("Refresh");
+
+        group.add(createGroup);
+        menuBar.add(group);
+
+        menuBar.add(new JSeparator());
+
         view.add(refresh);
         menuBar.add(view);
+
         setJMenuBar(menuBar);
+
+        createGroup.addActionListener(e -> createGroup());
         refresh.addActionListener(e -> callUpdateForeachGroup());
     }
 
@@ -319,6 +320,52 @@ public class User extends JFrame {
         else {
             JOptionPane.showMessageDialog(this, "No Empty Announcements are Allowed to Send");
         }
+    }
+
+    private void createGroup(){
+        String name = JOptionPane.showInputDialog(this, "Enter Group Name", "Add a New Group", JOptionPane.INFORMATION_MESSAGE);
+        try {
+            if (!name.isEmpty()) {
+                String agroupsQuery = String.format(
+                        "insert into agroups (gName) values ('%s')", name
+                );
+                int agroupsResult = con.prepareStatement(agroupsQuery).executeUpdate();
+
+                if (agroupsResult == 1){
+                    String getIdQuery = "SELECT LAST_INSERT_ID()";
+                    ResultSet getIdResult =
+                            con.prepareStatement(getIdQuery).executeQuery();
+                    if (getIdResult.next()){
+                        int id = getIdResult.getInt("LAST_INSERT_ID()");
+                        String groupmembersQuery = String.format(
+                                "insert into groupmembers (group_id, member_Id, isAdmin) values ('%d', '%d', true)",
+                                id, this.id
+                        );
+                        int groupmembersQueryResult = con.prepareStatement(groupmembersQuery).executeUpdate();
+                        if (groupmembersQueryResult == 1) {
+                            JOptionPane.showMessageDialog(this,
+                                    "Group has been created",
+                                    "Group creation success",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                                    groupsTabs.removeAll();
+                                    addGroups();
+                        }
+                        else
+                        {
+                            JOptionPane.showMessageDialog(this,
+                                    "Call administrator",
+                                    "Error in adding you to group",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            }
+        }
+        catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Error", "We could not create your group", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+        catch (NullPointerException ignored){}
     }
 
     private class updateMessages extends Thread{

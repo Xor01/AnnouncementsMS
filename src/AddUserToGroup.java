@@ -18,7 +18,13 @@ public class AddUserToGroup implements ActionListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        String usernameToAdd = JOptionPane.showInputDialog(frame.getContentPane(), "Enter a username to add");
+        JCheckBox isAdminCheckBox = new JCheckBox("Is Admin ?");
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+        panel.add(isAdminCheckBox);
+
+        String usernameToAdd = JOptionPane.showInputDialog(frame.getContentPane(), panel,"Enter a username to add", JOptionPane.INFORMATION_MESSAGE);
         try {
             if (usernameToAdd != null) {
                 usernameToAdd = usernameToAdd.trim();
@@ -31,9 +37,10 @@ public class AddUserToGroup implements ActionListener {
                 }
                 try {
                     while (userIdResult.next()) {
+                        boolean isAdmin = isAdminCheckBox.isSelected();
                         int userId = userIdResult.getInt("id");
                         String query = String.format("insert into groupmembers " +
-                                "(group_id, member_id) values ( %d , %d)", group_id, userId);
+                                "(group_id, member_id, isAdmin) values ( %d , %d, %b)", group_id, userId, isAdmin);
                         int r = con.prepareStatement(query).executeUpdate();
                         if (r == 1) {
                             JOptionPane.showMessageDialog(frame.getContentPane(), "User has been added");

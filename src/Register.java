@@ -11,11 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
-import java.sql.Statement;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +36,7 @@ public class Register extends JFrame {
         setVisible(true);
 
 
-        loginLabel = new JLabel("Welcome Create your --OurApplicationName-- Account");
+        loginLabel = new JLabel("Welcome Create your KFU Announcements Account");
         loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
         loginLabel.setVerticalAlignment(SwingConstants.CENTER);
 
@@ -179,12 +175,15 @@ public class Register extends JFrame {
 
                 try {
                     Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
-                    String query = String.format(
-                            "Insert into Users (fname, lname, username, pass, email) values ('%s', '%s', '%s', '%s', '%s'); ",
-                            firstname,lastname, username, ps.getHashedPassword(), email
-                    );
-                    Statement s = con.createStatement();
-                    int resultState = s.executeUpdate(query);
+                    String query = "Insert into Users (fname, lname, username, pass, email) values (?, ?, ?, ?, ?)";
+                    PreparedStatement preparedStatement = con.prepareStatement(query);
+                    preparedStatement.setString(1, firstname);
+                    preparedStatement.setString(2, lastname);
+                    preparedStatement.setString(3, username);
+                    preparedStatement.setString(4, ps.getHashedPassword());
+                    preparedStatement.setString(5, email);
+
+                    int resultState = preparedStatement.executeUpdate();
 
                     if (resultState == 1) {
                         loginLabel.setText("Your Account has been created !!");

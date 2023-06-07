@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.TextArea;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class User extends JFrame {
         JMenu view = new JMenu("View");
         JMenu group = new JMenu("Groups");
 
-        JMenuItem createGroup = new JMenuItem("add Group");
+        JMenuItem createGroup = new JMenuItem("Add Group");
         JMenuItem refresh = new JMenuItem("Refresh");
 
         group.add(createGroup);
@@ -258,10 +259,11 @@ public class User extends JFrame {
     private int getLastMessageId (int group_id) {
 
         try{
-            String query = String.format(
-                    "Select id from messages where group_id= %d order by id desc limit 1",
-                    group_id);
-            ResultSet result = con.prepareStatement(query).executeQuery();
+            String query =
+                    "Select id from messages where group_id= ? order by id desc limit 1";
+            PreparedStatement preparedStatement = con.prepareStatement(query);
+            preparedStatement.setInt(1, group_id);
+            ResultSet result = preparedStatement.executeQuery();
             if (result.next()){
                 return result.getInt("id");
             }
@@ -295,11 +297,14 @@ public class User extends JFrame {
         boolean isThisGroupAdmin = isAdminInGroup(groupsTabs.getSelectedComponent());
         if (isThisGroupAdmin && !message.isEmpty()){
             try {
-                String query = String.format(
-                        "INSERT INTO messages (sender_id, group_id, content, created_at) Values" +
-                        "(%d, %d, '%s', current_timestamp)",
-                id,group_ids.get(groupsTabs.getSelectedIndex()), message);
-                int r = con.prepareStatement(query).executeUpdate();
+                String query ="INSERT INTO messages (sender_id, group_id, content, created_at) Values" +
+                        "(?, ?, ?, current_timestamp)";
+
+                PreparedStatement sendPreparedStatement = con.prepareStatement(query);
+                sendPreparedStatement.setInt(1, id);
+                sendPreparedStatement.setInt(2, group_ids.get(groupsTabs.getSelectedIndex()));
+                sendPreparedStatement.setString(3, message);
+                int r = sendPreparedStatement.executeUpdate();
                 if (r == 1){
                     JOptionPane.showMessageDialog(this, "Successfully send the message");
                     callUpdateForeachGroup();
@@ -326,10 +331,10 @@ public class User extends JFrame {
         String name = JOptionPane.showInputDialog(this, "Enter Group Name", "Add a New Group", JOptionPane.INFORMATION_MESSAGE);
         try {
             if (!name.isEmpty()) {
-                String agroupsQuery = String.format(
-                        "insert into agroups (gName) values ('%s')", name
-                );
-                int agroupsResult = con.prepareStatement(agroupsQuery).executeUpdate();
+                String agroupsQuery = "insert into agroups (gName) values (?)";
+                PreparedStatement agroupsPreparedStatement = con.prepareStatement(agroupsQuery);
+                agroupsPreparedStatement.setString(1, name);
+                int agroupsResult = agroupsPreparedStatement.executeUpdate();
 
                 if (agroupsResult == 1){
                     String getIdQuery = "SELECT LAST_INSERT_ID()";

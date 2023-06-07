@@ -6,10 +6,7 @@ import javax.swing.BoxLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
 
 public class AddUserToGroup implements ActionListener {
 
@@ -33,20 +30,26 @@ public class AddUserToGroup implements ActionListener {
         try {
             if (usernameToAdd != null) {
                 usernameToAdd = usernameToAdd.trim();
-                ResultSet userIdResult = con.prepareStatement(
-                        String.format("select id from users where username = '%s'",
-                                usernameToAdd)).executeQuery();
+
                 if (usernameToAdd.isEmpty()){
                     JOptionPane.showMessageDialog(frame.getContentPane(), "Empty username");
                     return;
                 }
+                String userIdQuery = "select id from users where username = ?";
+                PreparedStatement userIdPreparedStatement = con.prepareStatement(userIdQuery);
+                userIdPreparedStatement.setString(1, usernameToAdd);
+                ResultSet userIdResult = userIdPreparedStatement.executeQuery();
                 try {
                     while (userIdResult.next()) {
                         boolean isAdmin = isAdminCheckBox.isSelected();
                         int userId = userIdResult.getInt("id");
-                        String query = String.format("insert into groupmembers " +
-                                "(group_id, member_id, isAdmin) values ( %d , %d, %b)", group_id, userId, isAdmin);
-                        int r = con.prepareStatement(query).executeUpdate();
+                        String query = "insert into groupmembers (group_id, member_id, isAdmin) values ( ? , ?, ?)";
+                        PreparedStatement groupMembersPreparedStatement = con.prepareStatement(query);
+                        groupMembersPreparedStatement.setInt(1, group_id);
+                        groupMembersPreparedStatement.setInt(2, userId);
+                        groupMembersPreparedStatement.setBoolean(3, isAdmin);
+
+                        int r = groupMembersPreparedStatement.executeUpdate();
                         if (r == 1) {
                             JOptionPane.showMessageDialog(frame.getContentPane(), "User has been added");
                         } else

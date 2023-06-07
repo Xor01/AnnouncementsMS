@@ -13,10 +13,7 @@ import java.awt.Toolkit;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
-import java.sql.ResultSet;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Login extends JFrame {
 
@@ -101,9 +98,11 @@ public class Login extends JFrame {
                 String password = new String(passwordField.getPassword()).trim();
                 PasswordHandler ps = new PasswordHandler(password);
                 Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
-                String query = String.format("Select * from Users where username = '%s'" +
-                        " and pass = '%s' ", username, ps.getHashedPassword());
-                ResultSet re = con.prepareStatement(query).executeQuery();
+                String query = "Select * from Users where username = ? and pass = ? ";
+                PreparedStatement loginPreparedStatement = con.prepareStatement(query);
+                loginPreparedStatement.setString(1, username);
+                loginPreparedStatement.setString(2, ps.getHashedPassword());
+                ResultSet re = loginPreparedStatement.executeQuery();
                if (re.next()){
                    loginLabel.setText("You are logged in");
                    dispose();

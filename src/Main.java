@@ -3,6 +3,9 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 
+/**
+ * Main Class
+ */
 public class Main {
     public static void main(String[] args) {
         FlatMacLightLaf.registerCustomDefaultsSource("style");

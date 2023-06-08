@@ -89,15 +89,14 @@ public class User extends JFrame {
      */
     private void addGroups(){
         try{
-            ResultSet result = con.prepareStatement(
-                    String.format(
-                            "SELECT agroups.*, groupmembers.group_id, groupmembers.isAdmin " +
-                                    "FROM agroups " +
-                                    "JOIN groupmembers ON agroups.id = groupmembers.group_id " +
-                                    "WHERE groupmembers.member_id = %d",
-                            this.id
-                    )
-            ).executeQuery();
+            String query = "SELECT agroups.*, groupmembers.group_id, groupmembers.isAdmin " +
+                    "FROM agroups " +
+                    "JOIN groupmembers ON agroups.id = groupmembers.group_id " +
+                    "WHERE groupmembers.member_id = ?";
+
+            PreparedStatement selectGroupsPreparedStatement = con.prepareStatement(query);
+            selectGroupsPreparedStatement.setInt(1, this.id);
+            ResultSet result = selectGroupsPreparedStatement.executeQuery();
 
             while (result.next()){
                 boolean isGroupAdmin = result.getBoolean("isAdmin");
@@ -292,6 +291,10 @@ public class User extends JFrame {
         document.insertString(document.getLength(), "  " + timestamp + "\n", timestampStyle);
     }
 
+    /**
+     *  This method sends messages to the correct group.
+     *  It knows the group id from the getSelectedIndex method
+     */
     private void sendMessage(){
         String message = typingArea.getText();
         boolean isThisGroupAdmin = isAdminInGroup(groupsTabs.getSelectedComponent());
@@ -327,6 +330,10 @@ public class User extends JFrame {
         }
     }
 
+    /**
+     * This method creates a group by prompting to user the group name
+     * Group creator will always be admin
+     */
     private void createGroup(){
         String name = JOptionPane.showInputDialog(this, "Enter Group Name", "Add a New Group", JOptionPane.INFORMATION_MESSAGE);
         try {
@@ -373,6 +380,10 @@ public class User extends JFrame {
         catch (NullPointerException ignored){}
     }
 
+    /**
+     * This method extends thread, and it creates a timer to run callUpdateForEachGroups
+     * Each 0.5 seconds
+     */
     private class updateMessages extends Thread{
 
         @Override

@@ -22,6 +22,9 @@ public class Login extends JFrame {
     private final JTextField usernameField;
     private final JPasswordField passwordField;
 
+    /**
+     * The Login Class
+     */
     public Login () {
         setLayout(new GridBagLayout());
         setTitle("Welcome - Login");
@@ -98,7 +101,7 @@ public class Login extends JFrame {
                 String password = new String(passwordField.getPassword()).trim();
                 PasswordHandler ps = new PasswordHandler(password);
                 Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
-                String query = "Select * from Users where username = ? and pass = ? ";
+                String query = "Select id, username, pass from Users where username = ? and pass = ? ";
                 PreparedStatement loginPreparedStatement = con.prepareStatement(query);
                 loginPreparedStatement.setString(1, username);
                 loginPreparedStatement.setString(2, ps.getHashedPassword());

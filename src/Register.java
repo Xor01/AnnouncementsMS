@@ -27,6 +27,9 @@ public class Register extends JFrame {
     private final JPasswordField passwordField;
 
 
+    /**
+     * The Registration Class
+     */
     public Register() {
         setLayout(new GridBagLayout());
         setTitle("Welcome - Register");

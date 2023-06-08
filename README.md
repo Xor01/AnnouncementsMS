@@ -12,6 +12,8 @@ It has these Following **features**:
 6. ***Well Documented*** Classes and methods are documented for easy understanding end improving
 7. ***Multithreading*** Multiple users can use it at the same time
 
+### Please add your DB credentials inside DBInfo and add .java extension to it
+
 # Registration Form
 ![Registration Form](https://github.com/Xor01/AnnouncementsMS/blob/826616d9952b04ecfb585685b19003c7e8e0bbae/assets/reg.png)
 

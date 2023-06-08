@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import java.awt.Font;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 public class ListUsersOfAGroup {
@@ -24,11 +25,10 @@ public class ListUsersOfAGroup {
 
     public void doWork() {
         try  {
-            String query = String.format(
-                    "SELECT * from users, groupmembers where group_id = %d and users.id = groupmembers.member_id",
-                    groupId
-            );
-            ResultSet resultSet = con.prepareStatement(query).executeQuery();
+            String query = "SELECT fname, lname, username,email from users, groupmembers where group_id = ? and users.id = groupmembers.member_id";
+            PreparedStatement selctFromUsersPreparedStatement = con.prepareStatement(query);
+            selctFromUsersPreparedStatement.setInt(1, groupId);
+            ResultSet resultSet = selctFromUsersPreparedStatement.executeQuery();
 
             DefaultListModel<String> listModel = new DefaultListModel<>();
             listModel.addElement("----- Members List of the Group -----");

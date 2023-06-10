@@ -13,6 +13,8 @@ import java.awt.Toolkit;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.*;
 
 public class Login extends JFrame {
@@ -106,6 +108,18 @@ public class Login extends JFrame {
                 loginPreparedStatement.setString(1, username);
                 loginPreparedStatement.setString(2, ps.getHashedPassword());
                 ResultSet re = loginPreparedStatement.executeQuery();
+
+                this.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        try {
+                            con.close();
+                        }
+                        catch(SQLException ignore){}
+                        super.windowClosing(e);
+                    }
+                });
+
                if (re.next()){
                    loginLabel.setText("You are logged in");
                    dispose();

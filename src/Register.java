@@ -11,6 +11,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.*;
 
 import java.util.regex.Matcher;
@@ -186,6 +188,16 @@ public class Register extends JFrame {
                     preparedStatement.setString(4, ps.getHashedPassword());
                     preparedStatement.setString(5, email);
 
+                    this.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosing(WindowEvent e) {
+                            try {
+                                con.close();
+                            }
+                            catch(SQLException ignore){}
+                            super.windowClosing(e);
+                        }
+                    });
                     int resultState = preparedStatement.executeUpdate();
 
                     if (resultState == 1) {

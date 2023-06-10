@@ -13,6 +13,8 @@ import java.awt.Component;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.TextArea;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -82,6 +84,19 @@ public class User extends JFrame {
 
         createGroup.addActionListener(e -> createGroup());
         refresh.addActionListener(e -> callUpdateForeachGroup());
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    if (con != null){
+                        con.close();
+                    }
+                }
+                catch(SQLException ignore){}
+                super.windowClosing(e);
+            }
+        });
     }
 
     /**
@@ -106,12 +121,12 @@ public class User extends JFrame {
                 groupDetails.add(new JScrollPane(announcementsPanel), BorderLayout.CENTER);
                 JButton addUser = new JButton(new FlatSVGIcon("addUser.svg"));
                 addUser.setToolTipText("Add users to " + result.getString("gName"));
-                /*  creating the three panels to have right and left panels both added to main panel*/
+                /*  creating the three panels to have right and left panels both added to the main panel*/
                 JPanel mainTopPanel = new JPanel(new BorderLayout());
                 JPanel leftTopPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
                 JPanel rightTopPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-                // adding left and right panels to main panel
+                // adding left and right panels to the main panel
                 mainTopPanel.add(leftTopPanel, BorderLayout.WEST);
                 mainTopPanel.add(rightTopPanel, BorderLayout.EAST);
 
@@ -252,7 +267,7 @@ public class User extends JFrame {
 
     /**
      * returns the last message id of a group
-     * @param group_id the id of a group to get last message id from
+     * @param group_id the id of a group to get the last message id from
      * @return returns last message id or -1 if non is found
      */
     private int getLastMessageId (int group_id) {

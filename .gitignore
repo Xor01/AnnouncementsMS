@@ -29,4 +29,5 @@ bin/
 .DS_Store
 
 ### MyCode ###
-src/.env
+src/main/java/.env
+/.env

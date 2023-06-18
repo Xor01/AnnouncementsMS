@@ -11,6 +11,7 @@ It has these Following **features**:
 5. ***Reliable*** it is easy to recover from errors
 6. ***Well Documented*** Classes and methods are documented for easy understanding end improving
 7. ***Multithreading*** Multiple users can use it at the same time
+8. ***Uses Maven*** for dependency management and build automation
 
 ### Please copy the template.env template into .env file, and edit the variables appropriately in the .env file.
 

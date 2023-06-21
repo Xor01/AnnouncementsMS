@@ -187,7 +187,9 @@ public class User extends JFrame {
                            }
                        }
                        catch (Exception e){
-                           e.printStackTrace();
+                           JOptionPane.showMessageDialog(getContentPane(),
+                                   "Try again or call support",
+                                   "Error", JOptionPane.ERROR_MESSAGE);
                        }
                    }
                 }
@@ -283,7 +285,9 @@ public class User extends JFrame {
             }
         }
         catch (SQLException sqlException){
-            sqlException.printStackTrace();
+            JOptionPane.showMessageDialog(getContentPane(),
+                    "Try again or call support",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         return -1;
@@ -390,7 +394,6 @@ public class User extends JFrame {
         }
         catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Error", "We could not create your group", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
         catch (NullPointerException ignored){}
     }

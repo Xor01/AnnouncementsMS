@@ -1,9 +1,9 @@
 import io.github.cdimascio.dotenv.Dotenv;
 final class DBInfo {
 
-    private static final String URL = Dotenv.load().get("URL");
-    private static final String USER = Dotenv.load().get("USER");
-    private static final String PASS = Dotenv.load().get("PASS");
+    private static final String URL = load("URL");
+    private static final String USER = load("USER");
+    private static final String PASS = load("PASS");
 
     public static String getURL() {
         return URL;
@@ -17,5 +17,12 @@ final class DBInfo {
         return PASS;
     }
 
-
+    private static String load(String s) {
+        try{
+            return Dotenv.load().get(s);
+        }
+        catch (Exception e){
+            return "";
+        }
+    }
 }

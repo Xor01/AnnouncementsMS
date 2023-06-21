@@ -218,7 +218,9 @@ public class Register extends JFrame {
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 catch (SQLException ex) {
-                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(getContentPane(),
+                            "Please try again or call support",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

@@ -136,8 +136,7 @@ public class Login extends JFrame {
             }
 
             catch (SQLException ex) {
-                ex.printStackTrace();
-                System.out.println("Error: Check your credentials or call support");
+                JOptionPane.showMessageDialog(getContentPane(), "Error: Check your credentials or call support", "Connection issues", JOptionPane.ERROR_MESSAGE);
             }
         });
 

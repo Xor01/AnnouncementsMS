@@ -39,6 +39,10 @@ public class AddUserToGroup implements ActionListener {
                 PreparedStatement userIdPreparedStatement = con.prepareStatement(userIdQuery);
                 userIdPreparedStatement.setString(1, usernameToAdd);
                 ResultSet userIdResult = userIdPreparedStatement.executeQuery();
+                if (!userIdResult.next()){
+                    JOptionPane.showMessageDialog(frame.getContentPane(), "User Not Found", "Error" , JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 try {
                     while (userIdResult.next()) {
                         boolean isAdmin = isAdminCheckBox.isSelected();

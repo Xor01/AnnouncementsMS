@@ -13,8 +13,8 @@ It has these Following **features**:
 7. ***Multithreading*** Multiple users can use it at the same time
 8. ***Uses Maven*** for dependency management and build automation
 
-### Please copy the template.env template into .env file, and edit the variables appropriately in the .env file.
-### Please run db.sql to get the database schema.
+### Please copy the <code>template.env</code> template into <code>.env</code> file, and edit the variables appropriately in the <code>.env</code> file.
+### Please run <code>db.sql</code> to get the database schema.
 # Registration Form
 ![Registration Form](https://github.com/Xor01/AnnouncementsMS/blob/826616d9952b04ecfb585685b19003c7e8e0bbae/assets/reg.png)
 

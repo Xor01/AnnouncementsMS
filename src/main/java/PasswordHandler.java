@@ -34,15 +34,8 @@ public final class PasswordHandler {
          throw new NoSuchAlgorithmException("could not perform calculation");
     }
 
-    public String getPassword(){
-        return this.password;
-    }
-
     public String getHashedPassword(){
         return this.hashedPassword;
     }
 
-    public boolean comparePasswords(String password1, String password2){
-        return password1.equals(password2);
-    }
 }

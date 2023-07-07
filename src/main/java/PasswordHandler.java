@@ -15,7 +15,7 @@ public final class PasswordHandler {
         }
     }
 
-    public String encrypt(String password) throws NoSuchAlgorithmException {
+    private String encrypt(String password) throws NoSuchAlgorithmException {
          try{
              MessageDigest mg = MessageDigest.getInstance("sha-256");
 

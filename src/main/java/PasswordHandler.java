@@ -3,11 +3,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 public final class PasswordHandler {
 
-    private final String password;
     private String hashedPassword;
 
     public PasswordHandler(String password){
-        this.password = password;
         try{
             this.hashedPassword = encrypt(password);
         }

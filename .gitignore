@@ -30,6 +30,7 @@ bin/
 
 ### MyCode ###
 /.env
+.env
 ./target/
 /target
 ../../../target/

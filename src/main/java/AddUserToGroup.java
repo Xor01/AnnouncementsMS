@@ -39,12 +39,8 @@ public class AddUserToGroup implements ActionListener {
                 PreparedStatement userIdPreparedStatement = con.prepareStatement(userIdQuery);
                 userIdPreparedStatement.setString(1, usernameToAdd);
                 ResultSet userIdResult = userIdPreparedStatement.executeQuery();
-                if (!userIdResult.next()){
-                    JOptionPane.showMessageDialog(frame.getContentPane(), "User Not Found", "Error" , JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 try {
-                    while (userIdResult.next()) {
+                    if (userIdResult.next()) {
                         boolean isAdmin = isAdminCheckBox.isSelected();
                         int userId = userIdResult.getInt("id");
                         String query = "insert into groupmembers (group_id, member_id, isAdmin) values ( ? , ?, ?)";

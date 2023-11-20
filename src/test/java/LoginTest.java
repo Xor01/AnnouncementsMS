@@ -5,6 +5,8 @@ class LoginTest {
     @Test
     void LoginCorrectCredentials(){
         Login login = new Login();
+        // admin-admin are the default credentials, you should never use them in a production environment
+        // this is only for testing purposes
         assertNotEquals(false, login.performLogin("admin", "admin"));
     }
     @Test

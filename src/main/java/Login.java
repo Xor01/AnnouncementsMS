@@ -145,5 +145,50 @@ public class Login extends JFrame {
             dispose();
         });
     }
+    public boolean performLogin(String username, String password){
+        try {
+            username = username.trim();
+            password = password.trim();
+            PasswordHandler ps = new PasswordHandler(password);
+            Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
+            String query = "Select id, username, pass from Users where username = ? and pass = ? ";
+            PreparedStatement loginPreparedStatement = con.prepareStatement(query);
+            loginPreparedStatement.setString(1, username);
+            loginPreparedStatement.setString(2, ps.getHashedPassword());
+            ResultSet re = loginPreparedStatement.executeQuery();
+
+            this.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    try {
+                        con.close();
+                    }
+                    catch(SQLException ignore){}
+                    super.windowClosing(e);
+                }
+            });
+
+            if (re.next()){
+                loginLabel.setText("You are logged in");
+                dispose();
+                int id = re.getInt("id");
+               return true;
+            }
+            else {
+                loginLabel.setText("Wrong username/password");
+                return false;
+            }
+
+        }
+        catch(com.mysql.cj.jdbc.exceptions.CommunicationsException el ){
+            JOptionPane.showMessageDialog(getContentPane(), "Your Connection with the our server could not be established", "Connection issues", JOptionPane.ERROR_MESSAGE);
+        }
+
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog(getContentPane(), "Error: Check your credentials or call support", "Connection issues", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return false;
+    }
 
 }

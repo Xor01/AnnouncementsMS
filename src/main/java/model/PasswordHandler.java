@@ -5,18 +5,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 public final class PasswordHandler {
 
-    private String hashedPassword;
-
-    public PasswordHandler(String password){
-        try{
-            this.hashedPassword = encrypt(password);
-        }
-        catch (NoSuchAlgorithmException noSuchAlgorithmException){
-            System.err.println("Error While Processing ");
-            System.exit(1);
-        }
-    }
-
     public static String encrypt(String password) throws NoSuchAlgorithmException {
         try{
             MessageDigest mg = MessageDigest.getInstance("sha-256");
@@ -32,10 +20,6 @@ public final class PasswordHandler {
             System.err.println("Error While Processing ");
         }
         throw new NoSuchAlgorithmException("could not perform calculation");
-    }
-
-    public String getHashedPassword(){
-        return this.hashedPassword;
     }
 
 }

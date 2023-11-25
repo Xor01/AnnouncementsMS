@@ -20,13 +20,13 @@ import java.util.regex.Pattern;
 
 public class Register extends JFrame {
 
-    private final JLabel loginLabel;
+    private JLabel loginLabel;
 
-    private final JTextField usernameField;
-    private final JTextField firstnameField;
-    private final JTextField lastNameField;
-    private final JTextField emailField;
-    private final JPasswordField passwordField;
+    private JTextField usernameField;
+    private JTextField firstnameField;
+    private JTextField lastNameField;
+    private JTextField emailField;
+    private JPasswordField passwordField;
 
 
     /**
@@ -38,9 +38,14 @@ public class Register extends JFrame {
         setSize(500, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setVisible(true);
+    }
 
-
+    public Runnable showWindow(){
+        setLayout(new GridBagLayout());
+        setTitle("Welcome - Register");
+        setSize(500, 500);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
         loginLabel = new JLabel("Welcome Create your KFU Announcements Account");
         loginLabel.setHorizontalAlignment(SwingConstants.CENTER);
         loginLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -159,73 +164,91 @@ public class Register extends JFrame {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
-            PasswordHandler ps = new PasswordHandler(password);
-            String regex = "^(.+)@(.+)$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(email);
-            if (firstname.isEmpty() || lastname.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            UserRecord userRecord = new UserRecord(username, firstname, lastname, password, email);
+            try {
+                performRegistration(userRecord);
+            }
+            catch (SQLIntegrityConstraintViolationException IE){
                 JOptionPane.showMessageDialog(getContentPane(),
-                        "All fields are mandatory!!",
-                        "Empty Fields",
-                        JOptionPane.ERROR_MESSAGE);
+                        "This Username/email are registered",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-            else if (!matcher.matches()) {
+            catch (SQLException ex) {
                 JOptionPane.showMessageDialog(getContentPane(),
-                        "Please Enter a valid email address",
-                        "Unvaried Email address",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-            else {
-
-                try {
-                    Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
-                    String query = "Insert into Users (fname, lname, username, pass, email) values (?, ?, ?, ?, ?)";
-                    PreparedStatement preparedStatement = con.prepareStatement(query);
-                    preparedStatement.setString(1, firstname);
-                    preparedStatement.setString(2, lastname);
-                    preparedStatement.setString(3, username);
-                    preparedStatement.setString(4, ps.getHashedPassword());
-                    preparedStatement.setString(5, email);
-
-                    this.addWindowListener(new WindowAdapter() {
-                        @Override
-                        public void windowClosing(WindowEvent e) {
-                            try {
-                                con.close();
-                            }
-                            catch(SQLException ignore){}
-                            super.windowClosing(e);
-                        }
-                    });
-                    int resultState = preparedStatement.executeUpdate();
-
-                    if (resultState == 1) {
-                        loginLabel.setText("Your Account has been created !!");
-                        JOptionPane.showMessageDialog(getContentPane(),
-                                "Your Account has been registered successfully",
-                                "Successful Registration", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        loginLabel.setText("An Error exist you");
-                        JOptionPane.showMessageDialog(getContentPane(),
-                                "An error happened we could not register you",
-                                "Failure Registration", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                catch (SQLIntegrityConstraintViolationException ee){
-                    JOptionPane.showMessageDialog(getContentPane(),
-                            "This Username/email are registered",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(getContentPane(),
-                            "Please try again or call support",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                        "Please try again or call support",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+        setVisible(true);
+        return null;
+    }
 
+    public boolean performRegistration(UserRecord userRecord) throws SQLIntegrityConstraintViolationException, SQLException{
+        String regex = "^(.+)@(.+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(userRecord.email());
+        if (userRecord.firstName().isEmpty() || userRecord.lastName().isEmpty() ||
+                userRecord.username().isEmpty() || userRecord.email().isEmpty() ||
+                userRecord.password().isEmpty()) {
+                if (this.isVisible()){
+                    JOptionPane.showMessageDialog(getContentPane(),
+                    "All fields are mandatory!!",
+                    "Empty Fields",
+                    JOptionPane.ERROR_MESSAGE);
+                }
+            return false;
+        }
 
+        else if (!matcher.matches()) {
+            if (this.isVisible()){
+                            JOptionPane.showMessageDialog(getContentPane(),
+                    "Please Enter a valid email address",
+                    "Unvaried Email address",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+            return false;
+        }
+        else {
+
+            Connection con = DriverManager.getConnection(DBInfo.getURL(), DBInfo.getUSER(), DBInfo.getPASS());
+            String query = "Insert into Users (fname, lname, username, pass, email) values (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = con.prepareStatement(query);
+            preparedStatement.setString(1, userRecord.firstName());
+            preparedStatement.setString(2, userRecord.lastName());
+            preparedStatement.setString(3, userRecord.username());
+            preparedStatement.setString(4, userRecord.password());
+            preparedStatement.setString(5, userRecord.email());
+
+            this.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    try {
+                        con.close();
+                    }
+                    catch(SQLException ignore){}
+                    super.windowClosing(e);
+                }
+            });
+            int resultState = preparedStatement.executeUpdate();
+
+            if (resultState == 1) {
+                if (this.isVisible()) {
+                    loginLabel.setText("Your Account has been created !!");
+                    JOptionPane.showMessageDialog(getContentPane(),
+                            "Your Account has been registered successfully",
+                            "Successful Registration", JOptionPane.INFORMATION_MESSAGE);
+                }
+                return true;
+            } else if (this.isVisible()) {
+                loginLabel.setText("An Error exist you");
+                JOptionPane.showMessageDialog(getContentPane(),
+                        "An error happened we could not register you",
+                        "Failure Registration", JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+        return false;
     }
 
 }

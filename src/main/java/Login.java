@@ -141,7 +141,8 @@ public class Login extends JFrame {
         });
 
         registerBtn.addActionListener(e -> {
-            SwingUtilities.invokeLater(Register::new);
+            Register register = new Register();
+            SwingUtilities.invokeLater(register.showWindow());
             dispose();
         });
     }

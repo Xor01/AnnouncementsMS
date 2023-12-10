@@ -3,12 +3,11 @@ import org.junit.jupiter.api.Test;
 class UserTest {
 
     @Test
-    public void addAvailableUserToGroup(){
-
+    public void addNotMemberUserToGroup(){
     }
 
     @Test
-    public void addExistedUserToGroup(){
+    public void addMemberUserToGroup(){
 
     }
 }

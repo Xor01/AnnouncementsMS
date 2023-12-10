@@ -184,7 +184,7 @@ public class Register extends JFrame {
         return null;
     }
 
-    public boolean performRegistration(UserRecord userRecord) throws SQLIntegrityConstraintViolationException, SQLException{
+    public boolean performRegistration(UserRecord userRecord) throws SQLException{
         String regex = "^(.+)@(.+)$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(userRecord.email());

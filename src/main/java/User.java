@@ -221,7 +221,7 @@ public class User extends JFrame {
     /**
      * this method will load each message for each group
      */
-    public void loadMessages(int group_id, JTextPane panel) {
+    private void loadMessages(int group_id, JTextPane panel) {
         StyledDocument document = panel.getStyledDocument();
 
         // Create a style for the sender name

@@ -69,4 +69,33 @@ public class AddUserToGroup implements ActionListener {
             throw new RuntimeException(ex);
         }
     }
+
+    boolean addUserToGroup(String usernameToAdd, boolean isAdmin) throws SQLIntegrityConstraintViolationException, SQLException {
+
+        if (usernameToAdd != null) {
+            usernameToAdd = usernameToAdd.trim();
+
+            if (usernameToAdd.isEmpty()){
+                System.out.println("Empty username");
+                return false;
+            }
+            String userIdQuery = "select id from users where username = ?";
+            PreparedStatement userIdPreparedStatement = con.prepareStatement(userIdQuery);
+            userIdPreparedStatement.setString(1, usernameToAdd);
+            ResultSet userIdResult = userIdPreparedStatement.executeQuery();
+
+            if (userIdResult.next()) {
+                int userId = userIdResult.getInt("id");
+                String query = "insert into groupmembers (group_id, member_id, isAdmin) values ( ? , ?, ?)";
+                PreparedStatement groupMembersPreparedStatement = con.prepareStatement(query);
+                groupMembersPreparedStatement.setInt(1, group_id);
+                groupMembersPreparedStatement.setInt(2, userId);
+                groupMembersPreparedStatement.setBoolean(3, isAdmin);
+
+                int r = groupMembersPreparedStatement.executeUpdate();
+                return r == 1;
+            }
+        }
+        return false;
+    }
 }

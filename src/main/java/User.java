@@ -49,7 +49,7 @@ public class User extends JFrame {
         group_ids = new ArrayList<>();
         /*  This is the beginning of the jTabbedPane  */
         groupsTabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
-        addGroups();
+        loadGroupsToUI();
         add(groupsTabs);
         /*  This is the end of the jTabbedPane  */
 
@@ -102,7 +102,7 @@ public class User extends JFrame {
     /**
      * This method will load the group a specific user is registered in
      */
-    private void addGroups(){
+    private void loadGroupsToUI(){
         try{
             String query = "SELECT agroups.*, groupmembers.group_id, groupmembers.isAdmin " +
                     "FROM agroups " +
@@ -135,7 +135,7 @@ public class User extends JFrame {
                 leftTopPanel.add(updateBtn);
                 updateBtn.addActionListener(e -> {
                     groupsTabs.removeAll();
-                    addGroups();
+                    loadGroupsToUI();
                 });
                 leftTopPanel.add(addUser);
                 if (!isGroupAdmin){
@@ -379,7 +379,7 @@ public class User extends JFrame {
                                     "Group creation success",
                                     JOptionPane.INFORMATION_MESSAGE);
                                     groupsTabs.removeAll();
-                                    addGroups();
+                                    loadGroupsToUI();
                         }
                         else
                         {
@@ -396,6 +396,20 @@ public class User extends JFrame {
             JOptionPane.showMessageDialog(this, "Error", "We could not create your group", JOptionPane.ERROR_MESSAGE);
         }
         catch (NullPointerException ignored){}
+    }
+
+    boolean createGroupTest(){
+        try {
+            String agroupsQuery = "insert into agroups (gName) values ('demo')";
+            PreparedStatement agroupsPreparedStatement = con.prepareStatement(agroupsQuery);
+            int agroupsResult = agroupsPreparedStatement.executeUpdate();
+            return agroupsResult == 1;
+        }
+        catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Error", "We could not create your group", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (NullPointerException ignored){}
+        return false;
     }
 
     /**

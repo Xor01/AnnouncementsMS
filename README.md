@@ -1,11 +1,5 @@
 <p align="center">
-  <img src="https://img.icons8.com/?size=512&id=55494&format=png" width="20%" alt="ANNOUNCEMENTSMS-logo">
-</p>
-<p align="center">
     <h1 align="center">ANNOUNCEMENTSMS</h1>
-</p>
-<p align="center">
-    <em>Empowering user experiences, one interaction at a time.</em>
 </p>
 <p align="center">
 	<img src="https://img.shields.io/github/license/Xor01/AnnouncementsMS?style=flat&logo=opensourceinitiative&logoColor=white&color=e2192e" alt="license">
@@ -43,23 +37,6 @@
 ##  Overview
 
 AnnouncementsMS is a comprehensive software project that streamlines user management and interaction within organizations. Its core functionalities include user registration, login authentication, group management, and secure password handling. Leveraging a well-structured architecture, AnnouncementsMS offers a user-friendly interface for adding users to groups, viewing member details, and ensuring database integrity. By integrating essential features like user record management and login validation, the project enhances system security and data management efficiency, making it a valuable tool for effective organization-wide communication.
-
----
-
-##  Features
-
-|    |   Feature         | Description |
-|----|-------------------|---------------------------------------------------------------|
-| ⚙️  | **Architecture**  | The project follows a modular architecture with distinct components like Register, Login, AddUserToGroup classes. It uses Java Swing for GUI interfaces and dotenv for secure database connection retrieval. |
-| 🔩 | **Code Quality**  | The codebase demonstrates good coding practices and encapsulation. The classes are well-structured and follow Java conventions for maintainability. |
-| 📄 | **Documentation** | The repository includes a README.md file providing basic information about the project. More documentation on functionalities, APIs, and setup would enhance its quality. |
-| 🔌 | **Integrations**  | Relies on Java Swing for GUI components and dotenv for securely retrieving database connection information. |
-| 🧩 | **Modularity**    | The project exhibits modularity with separate classes for user registration, login, database handling, and user interactions, promoting reusability. |
-| 🧪 | **Testing**       | Testing frameworks and tools used are not specified in the details provided. Implementing unit and integration tests would enhance code reliability. |
-| ⚡️  | **Performance**   | Efficiency and resource usage not explicitly mentioned. Optimizing database queries and GUI rendering could improve performance. |
-| 🛡️ | **Security**      | Uses dotenv for securely retrieving database connection information. More details on data encryption, user authentication, and authorization mechanisms would enhance security measures. |
-| 📦 | **Dependencies**  | Key dependencies include SQL and Java. More detailed listing of external libraries used could provide better insights. |
-| 🚀 | **Scalability**   | Scalability aspects like handling increased traffic are not explicitly discussed. Enhancements in database design and load balancing strategies would aid in scalability. |
 
 ---
 
@@ -125,7 +102,7 @@ AnnouncementsMS is a comprehensive software project that streamlines user manage
 
 ###  Prerequisites
 
-**Java**: `version x.y.z`
+**Java**: `version 19`
 
 ###  Installation
 
